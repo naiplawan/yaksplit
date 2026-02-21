@@ -7,10 +7,9 @@ import { useCreateExpense } from '@/lib/hooks/useExpenses'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Container } from '@/components/layout/Container'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Save } from 'lucide-react'
+import { ArrowLeft, Save, Banknote, Divide } from 'lucide-react'
 import Link from 'next/link'
 import {
   Select,
@@ -20,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { formatThaiCurrency } from '@/lib/utils/format'
 
 type SplitType = 'equal' | 'custom' | 'percentage'
 
@@ -66,13 +66,18 @@ export default function NewExpensePage({ params }: { params: Promise<{ id: strin
     }
   }
 
+  const amountNum = parseFloat(amount) || 0
+  const splitPerPerson = splitType === 'equal' && event
+    ? amountNum / event.members.length
+    : 0
+
   if (!resolvedParams || isLoading) {
     return (
       <Container>
-        <div className="py-8">
+        <div className="py-4 safe-area-pt">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded w-1/3" />
-            <div className="h-32 bg-muted rounded" />
+            <div className="h-6 w-32 bg-[rgb(var(--color-border))] rounded" />
+            <div className="h-32 bg-[rgb(var(--color-border))] rounded-2xl" />
           </div>
         </div>
       </Container>
@@ -82,186 +87,236 @@ export default function NewExpensePage({ params }: { params: Promise<{ id: strin
   if (!event) {
     return (
       <Container>
-        <div className="py-8 text-center">
-          <p className="text-muted-foreground">Event not found</p>
+        <div className="py-4 safe-area-pt text-center">
+          <p className="text-[rgb(var(--color-text-secondary))]">Event not found</p>
         </div>
       </Container>
     )
   }
 
   return (
-    <Container size="md">
-      <div className="py-8 space-y-6">
+    <Container>
+      <div className="py-4 safe-area-pt space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/events/${eventId}`}>
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/events/${eventId}`}
+            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+          >
+            <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
+          </Link>
           <div>
-            <h1 className="text-2xl font-bold">Add Expense</h1>
-            <p className="text-muted-foreground">{event.title}</p>
+            <h1 className="text-lg font-bold text-[rgb(var(--color-text))]">
+              Add Expense
+            </h1>
+            <p className="text-sm text-[rgb(var(--color-text-secondary))]">
+              {event.title}
+            </p>
           </div>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Expense Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  placeholder="e.g., Dinner at Som Tum Nua"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Amount Display Card */}
+          <div className="card-mobile p-6 bg-gradient-to-br from-[rgb(var(--color-secondary))]/20 to-[rgb(var(--color-accent))]/20 border-[rgb(var(--color-secondary))]/30 text-center">
+            <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-1">
+              Total Amount
+            </p>
+            <div className="flex items-center justify-center gap-1">
+              <span className="text-3xl font-bold text-[rgb(var(--color-text))]">฿</span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="w-32 bg-transparent text-4xl font-bold text-[rgb(var(--color-text))] text-center focus:outline-none focus:ring-0 p-0"
+                required
+                autoFocus
+              />
+            </div>
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="amount">Amount (THB) *</Label>
-                <Input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
-              </div>
+          {/* Expense Details */}
+          <div className="card-mobile p-5 space-y-5">
+            <div className="flex items-center gap-2">
+              <Banknote className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+              <h2 className="font-semibold text-[rgb(var(--color-text))]">
+                Expense Details
+              </h2>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="payer">Paid by *</Label>
-                <Select value={payerId} onValueChange={setPayerId} required>
-                  <SelectTrigger id="payer">
-                    <SelectValue placeholder="Select who paid" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {event.members.map((member) => (
-                      <SelectItem key={member.id} value={member.id}>
-                        {member.nickname}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm text-[rgb(var(--color-text))]">
+                What was this for? <span className="text-[rgb(var(--color-error))]">*</span>
+              </Label>
+              <Input
+                id="title"
+                placeholder="e.g., Dinner at Som Tum Nua"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                className="h-12"
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="notes">Notes (optional)</Label>
-                <Textarea
-                  id="notes"
-                  placeholder="Add any notes about this expense..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                />
-              </div>
-            </CardContent>
-          </Card>
+            <div className="space-y-2">
+              <Label htmlFor="payer" className="text-sm text-[rgb(var(--color-text))]">
+                Who paid? <span className="text-[rgb(var(--color-error))]">*</span>
+              </Label>
+              <Select value={payerId} onValueChange={setPayerId} required>
+                <SelectTrigger id="payer" className="h-12">
+                  <SelectValue placeholder="Select who paid" />
+                </SelectTrigger>
+                <SelectContent>
+                  {event.members.map((member) => (
+                    <SelectItem key={member.id} value={member.id}>
+                      {member.nickname}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Split Type</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <RadioGroup value={splitType} onValueChange={(v) => setSplitType(v as SplitType)}>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2 border p-3 rounded-lg cursor-pointer hover:bg-accent/50">
-                    <RadioGroupItem value="equal" id="equal" />
+            <div className="space-y-2">
+              <Label htmlFor="notes" className="text-sm text-[rgb(var(--color-text))]">
+                Notes <span className="text-[rgb(var(--color-text-tertiary))]">(optional)</span>
+              </Label>
+              <Textarea
+                id="notes"
+                placeholder="Add any notes about this expense..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+                className="resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Split Type */}
+          <div className="card-mobile p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Divide className="h-5 w-5 text-[rgb(var(--color-accent))]" />
+              <h2 className="font-semibold text-[rgb(var(--color-text))]">
+                How to Split?
+              </h2>
+            </div>
+
+            <RadioGroup value={splitType} onValueChange={(v) => setSplitType(v as SplitType)}>
+              <div className="space-y-3">
+                <div
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all touch-feedback active:scale-[0.99] ${
+                    splitType === 'equal'
+                      ? 'border-[rgb(var(--color-primary))] bg-[rgb(var(--color-primary))]/10'
+                      : 'border-[rgb(var(--color-border-light))] hover:border-[rgb(var(--color-border))]'
+                  }`}
+                  onClick={() => setSplitType('equal')}
+                >
+                  <div className="flex items-start gap-3">
+                    <RadioGroupItem value="equal" id="equal" className="mt-1" />
                     <Label htmlFor="equal" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Split Equally</div>
-                      <div className="text-sm text-muted-foreground">
-                        Divide equally among all members
+                      <div className="font-medium text-[rgb(var(--color-text))]">Split Equally</div>
+                      <div className="text-sm text-[rgb(var(--color-text-secondary))]">
+                        ฿{splitPerPerson.toFixed(2)} per person
                       </div>
                     </Label>
                   </div>
+                </div>
 
-                  <div className="flex items-center space-x-2 border p-3 rounded-lg cursor-pointer hover:bg-accent/50">
-                    <RadioGroupItem value="custom" id="custom" />
+                <div
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all touch-feedback active:scale-[0.99] ${
+                    splitType === 'custom'
+                      ? 'border-[rgb(var(--color-primary))] bg-[rgb(var(--color-primary))]/10'
+                      : 'border-[rgb(var(--color-border-light))] hover:border-[rgb(var(--color-border))]'
+                  }`}
+                  onClick={() => setSplitType('custom')}
+                >
+                  <div className="flex items-start gap-3">
+                    <RadioGroupItem value="custom" id="custom" className="mt-1" />
                     <Label htmlFor="custom" className="flex-1 cursor-pointer">
-                      <div className="font-medium">Custom Amounts</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-medium text-[rgb(var(--color-text))]">Custom Amounts</div>
+                      <div className="text-sm text-[rgb(var(--color-text-secondary))]">
                         Set specific amounts for each member
                       </div>
                     </Label>
                   </div>
+                </div>
 
-                  <div className="flex items-center space-x-2 border p-3 rounded-lg cursor-pointer hover:bg-accent/50">
-                    <RadioGroupItem value="percentage" id="percentage" />
+                <div
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all touch-feedback active:scale-[0.99] ${
+                    splitType === 'percentage'
+                      ? 'border-[rgb(var(--color-primary))] bg-[rgb(var(--color-primary))]/10'
+                      : 'border-[rgb(var(--color-border-light))] hover:border-[rgb(var(--color-border))]'
+                  }`}
+                  onClick={() => setSplitType('percentage')}
+                >
+                  <div className="flex items-start gap-3">
+                    <RadioGroupItem value="percentage" id="percentage" className="mt-1" />
                     <Label htmlFor="percentage" className="flex-1 cursor-pointer">
-                      <div className="font-medium">By Percentage</div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="font-medium text-[rgb(var(--color-text))]">By Percentage</div>
+                      <div className="text-sm text-[rgb(var(--color-text-secondary))]">
                         Split by percentage shares
                       </div>
                     </Label>
                   </div>
                 </div>
-              </RadioGroup>
-            </CardContent>
-          </Card>
+              </div>
+            </RadioGroup>
+          </div>
 
           {/* Split Preview */}
-          {amount && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Split Preview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {event.members.map((member) => {
-                    const splitAmount = splitType === 'equal'
-                      ? parseFloat(amount || '0') / event.members.length
-                      : 0
+          {amountNum > 0 && (
+            <div className="card-mobile p-5 space-y-4">
+              <h2 className="font-semibold text-[rgb(var(--color-text))]">
+                Split Preview
+              </h2>
+              <div className="space-y-3">
+                {event.members.map((member) => {
+                  const splitAmount = splitType === 'equal'
+                    ? amountNum / event.members.length
+                    : 0
 
-                    return (
-                      <div key={member.id} className="flex justify-between py-1">
-                        <span>{member.nickname}</span>
-                        <span className="font-medium">
-                          {splitAmount > 0
-                            ? new Intl.NumberFormat('th-TH', {
-                                style: 'currency',
-                                currency: 'THB',
-                              }).format(splitAmount)
-                            : '-'}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+                  return (
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between py-2 border-b border-[rgb(var(--color-border-light))] last:border-0"
+                    >
+                      <span className="text-[rgb(var(--color-text))]">{member.nickname}</span>
+                      <span className="font-semibold text-[rgb(var(--color-text))]">
+                        {splitAmount > 0 ? formatThaiCurrency(splitAmount) : '-'}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           )}
 
-          <div className="flex gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex-1"
-              asChild
-            >
-              <Link href={`/events/${eventId}`}>Cancel</Link>
-            </Button>
-            <Button
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3 pb-safe">
+            <Link href={`/events/${eventId}`} className="flex-1">
+              <button
+                type="button"
+                className="w-full h-12 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text))] font-medium touch-feedback active:scale-[0.98] transition-all border border-[rgb(var(--color-border-light))]"
+              >
+                Cancel
+              </button>
+            </Link>
+            <button
               type="submit"
-              className="flex-1"
+              className="flex-1 btn-primary h-12 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={createExpense.isPending || !title.trim() || !amount || !payerId}
             >
               {createExpense.isPending ? (
                 'Saving...'
               ) : (
                 <>
-                  <Save className="mr-2 h-4 w-4" />
+                  <Save className="h-5 w-5" />
                   Save Expense
                 </>
               )}
-            </Button>
+            </button>
           </div>
         </form>
       </div>

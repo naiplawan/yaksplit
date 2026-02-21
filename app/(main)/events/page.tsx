@@ -1,162 +1,315 @@
 'use client'
 
 import { useEvents } from '@/lib/hooks/useEvents'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/layout/Container'
-import { Plus, Users, Calendar, Copy, MoreVertical } from 'lucide-react'
+import {
+  Plus,
+  Calendar,
+  Users,
+  Copy,
+  MoreVertical,
+  Sparkles,
+  CheckCircle,
+} from 'lucide-react'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
+import { formatThaiCurrency } from '@/lib/utils/format'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useState } from 'react'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 
 export default function EventsPage() {
   const { data: events, isLoading, error } = useEvents()
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('active')
 
   const activeEvents = events?.filter((e) => e.status === 'active') || []
   const completedEvents = events?.filter((e) => e.status === 'completed') || []
+  const filteredEvents =
+    (filter === 'all' ? events : filter === 'active' ? activeEvents : completedEvents) || []
 
   return (
     <Container>
-      <div className="py-8 space-y-8">
+      <div className="py-4 safe-area-pt space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Events</h1>
-            <p className="text-muted-foreground">Manage your bill splits</p>
+            <h1 className="text-2xl font-bold text-[rgb(var(--color-text))]">
+              Events
+            </h1>
+            <p className="text-sm text-[rgb(var(--color-text-secondary))]">
+              {activeEvents.length} active event{activeEvents.length !== 1 ? 's' : ''}
+            </p>
           </div>
-          <Button asChild>
-            <Link href="/events/new">
-              <Plus className="mr-2 h-4 w-4" />
-              New Event
-            </Link>
-          </Button>
         </div>
 
+        {/* Filter Tabs - Horizontal Scroll */}
+        <div className="flex gap-2 overflow-x-auto snap-x-mobile pb-2 scrollbar-hide">
+          <FilterTab
+            active={filter === 'active'}
+            count={activeEvents.length}
+            onClick={() => setFilter('active')}
+          >
+            Active
+          </FilterTab>
+          <FilterTab
+            active={filter === 'completed'}
+            count={completedEvents.length}
+            onClick={() => setFilter('completed')}
+          >
+            Completed
+          </FilterTab>
+          <FilterTab
+            active={filter === 'all'}
+            count={events?.length || 0}
+            onClick={() => setFilter('all')}
+          >
+            All Events
+          </FilterTab>
+        </div>
+
+        {/* Content */}
         {isLoading ? (
-          <div className="animate-pulse space-y-4">
-            <div className="h-32 bg-muted rounded" />
-            <div className="h-32 bg-muted rounded" />
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <div className="animate-pulse flex flex-col items-center gap-4">
+              <div className="h-12 w-12 rounded-full bg-[rgb(var(--color-border))]"></div>
+              <div className="h-4 w-32 rounded-full bg-[rgb(var(--color-border))]"></div>
+            </div>
           </div>
         ) : error ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-destructive">Failed to load events</p>
-            </CardContent>
-          </Card>
-        ) : events?.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <div className="flex flex-col items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-muted-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-1">No events yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Create your first event to start splitting bills
-                  </p>
-                  <Button asChild>
-                    <Link href="/events/new">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create Event
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="card-mobile p-8 text-center">
+            <p className="text-[rgb(var(--color-text-secondary))] mb-4">
+              Unable to load events
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="btn-primary"
+            >
+              Retry
+            </button>
+          </div>
+        ) : filteredEvents?.length === 0 ? (
+          <EmptyState
+            icon={<Sparkles className="h-12 w-12" />}
+            title={filter === 'completed' ? 'No completed events' : 'No events yet'}
+            description={
+              filter === 'active'
+                ? 'Create your first event to start splitting bills with friends'
+                : 'Events will appear here once you create them'
+            }
+            action={{
+              label: 'Create Event',
+              href: '/events/new',
+            }}
+          />
         ) : (
-          <>
-            {/* Active Events */}
-            {activeEvents.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Active Events</h2>
-                <div className="grid gap-4">
-                  {activeEvents.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Completed Events */}
-            {completedEvents.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Completed Events</h2>
-                <div className="grid gap-4">
-                  {completedEvents.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
+          <div className="space-y-3">
+            {filteredEvents.map((event) => (
+              <EventCard key={event.id} event={event} />
+            ))}
+          </div>
         )}
       </div>
     </Container>
   )
 }
 
+// Filter Tab Component
+function FilterTab({
+  active,
+  count,
+  onClick,
+  children,
+}: {
+  active: boolean
+  count: number
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all
+        touch-feedback min-h-[var(--touch-target)]
+        ${
+          active
+            ? 'bg-[rgb(var(--color-primary))] text-white shadow-lg shadow-[rgb(var(--color-primary))]/30'
+            : 'bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text-secondary))] hover:bg-[rgb(var(--color-border-light))]'
+        }
+      `}
+    >
+      {children}
+      <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-white/20">
+        {count}
+      </span>
+    </button>
+  )
+}
+
+// Mobile Event Card Component
 function EventCard({ event }: { event: any }) {
-  const copyShareCode = () => {
+  const memberCount = event.members?.length || 0
+  const shareCode = event.share_code || '----'
+
+  const copyShareLink = () => {
     const url = `${window.location.origin}/share/${event.share_code}`
     navigator.clipboard.writeText(url)
   }
 
+  const isCompleted = event.status === 'completed'
+
   return (
-    <Card className="hover:bg-accent/50 transition-colors">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
+    <Link href={`/events/${event.id}`} className="block touch-feedback">
+      <div className="card-mobile p-4 transition-all duration-200 active:scale-[0.99]">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <CardTitle className="truncate">{event.title}</CardTitle>
-              <Badge variant={event.status === 'active' ? 'default' : 'secondary'}>
-                {event.status}
-              </Badge>
+              <h3 className="font-semibold text-[rgb(var(--color-text))] text-base truncate pr-2">
+                {event.title}
+              </h3>
+              {isCompleted && (
+                <span className="flex-shrink-0 px-2 py-0.5 rounded-full bg-[rgb(var(--color-success))]/20 text-[rgb(var(--color-success))] text-xs font-medium">
+                  <CheckCircle className="h-3 w-3 inline mr-1" />
+                  Done
+                </span>
+              )}
             </div>
             {event.description && (
-              <p className="text-sm text-muted-foreground line-clamp-1">
+              <p className="text-sm text-[rgb(var(--color-text-secondary))] truncate">
                 {event.description}
               </p>
             )}
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={copyShareCode}>
-                <Copy className="mr-2 h-4 w-4" />
-                Copy share link
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1">
-              <Users className="h-4 w-4" />
-              <span>{event.members.length} members</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>{new Date(event.created_at).toLocaleDateString('th-TH')}</span>
-            </div>
+          <div className="flex-shrink-0">
+            <Link
+              href={`/events/${event.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] active:scale-95 transition-transform"
+            >
+              <Users className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
+            </Link>
           </div>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={`/events/${event.id}`}>View</Link>
-          </Button>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Event Meta */}
+        <div className="flex items-center gap-3 text-sm text-[rgb(var(--color-text-tertiary))] mb-3">
+          <div className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            <span>{memberCount} people</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Calendar className="h-4 w-4" />
+            <span>{new Date(event.created_at).toLocaleDateString('th-TH', { month: 'short', day: 'numeric' })}</span>
+          </div>
+          <div className="ml-auto">
+            <code className="px-2 py-1 rounded-lg bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-primary))] font-mono text-xs">
+              {shareCode}
+            </code>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex items-center gap-2 pt-3 border-t border-[rgb(var(--color-border-light))]">
+          <Link
+            href={`/events/${event.id}/pay`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex-1 btn-primary py-2.5 text-sm text-center"
+          >
+            Pay Share
+          </Link>
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="h-11 px-4 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text-secondary))] font-medium text-sm touch-feedback active:scale-95 transition-all"
+              >
+                <MoreVertical className="h-5 w-5" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl">
+              <SheetHeader>
+                <SheetTitle>Event Actions</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-2 mt-4">
+                <Link
+                  href={`/events/${event.id}`}
+                  className="block w-full p-4 rounded-xl bg-[rgb(var(--color-bg-alt))] text-left touch-feedback active:scale-[0.98] transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+                    <div>
+                      <div className="font-medium text-[rgb(var(--color-text))]">View Details</div>
+                      <div className="text-sm text-[rgb(var(--color-text-secondary))]">See members and expenses</div>
+                    </div>
+                  </div>
+                </Link>
+                <button
+                  onClick={copyShareLink}
+                  className="block w-full p-4 rounded-xl bg-[rgb(var(--color-bg-alt))] text-left touch-feedback active:scale-[0.98] transition-all"
+                >
+                  <div className="flex items-center gap-3">
+                    <Copy className="h-5 w-5 text-[rgb(var(--color-accent))]" />
+                    <div>
+                      <div className="font-medium text-[rgb(var(--color-text))]">Copy Share Link</div>
+                      <div className="text-sm text-[rgb(var(--color-text-secondary))]">Send to friends</div>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+// Empty State Component
+function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+}: {
+  icon: React.ReactNode
+  title: string
+  description: string
+  action?: {
+    label: string
+    href: string
+  }
+}) {
+  return (
+    <div className="card-mobile p-8 text-center">
+      <div className="h-20 w-20 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-4">
+        <div className="text-[rgb(var(--color-text-tertiary)]">
+          {icon}
+        </div>
+      </div>
+      <h3 className="text-lg font-semibold text-[rgb(var(--color-text))] mb-2">
+        {title}
+      </h3>
+      <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-6">
+        {description}
+      </p>
+      {action && (
+        <Link href={action.href}>
+          <button className="btn-primary w-full">
+            {action.label}
+          </button>
+        </Link>
+      )}
+    </div>
   )
 }

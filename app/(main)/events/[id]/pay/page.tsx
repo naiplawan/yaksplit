@@ -6,16 +6,16 @@ import { useExpenses } from '@/lib/hooks/useExpenses'
 import { useSplitQR, useMarkAsPaid } from '@/lib/hooks/useSplits'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/layout/Container'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, CheckCircle, Copy, QrCode, Download } from 'lucide-react'
+import { ArrowLeft, CheckCircle, Copy, QrCode, Download, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { formatThaiCurrency } from '@/lib/utils/format'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
 
 export default function PaymentPage({ params }: { params: Promise<{ id: string }> }) {
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
   const [selectedSplitId, setSelectedSplitId] = useState<string | null>(null)
+  const [showInstructions, setShowInstructions] = useState(false)
 
   Promise.resolve(params).then((p) => setResolvedParams(p))
 
@@ -80,10 +80,10 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
   if (!resolvedParams || eventLoading || expensesLoading) {
     return (
       <Container>
-        <div className="py-8">
+        <div className="py-4 safe-area-pt">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-muted rounded w-1/3" />
-            <div className="h-64 bg-muted rounded" />
+            <div className="h-6 w-32 bg-[rgb(var(--color-border))] rounded" />
+            <div className="h-64 bg-[rgb(var(--color-border))] rounded-2xl" />
           </div>
         </div>
       </Container>
@@ -93,8 +93,8 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
   if (!event) {
     return (
       <Container>
-        <div className="py-8 text-center">
-          <p className="text-muted-foreground">Event not found</p>
+        <div className="py-4 safe-area-pt text-center">
+          <p className="text-[rgb(var(--color-text-secondary))]">Event not found</p>
         </div>
       </Container>
     )
@@ -103,152 +103,207 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
   const totalOwed = pendingSplits.reduce((sum, s) => sum + (s.amount_owed - s.amount_paid), 0)
 
   return (
-    <Container size="md">
-      <div className="py-8 space-y-6">
+    <Container>
+      <div className="py-4 safe-area-pt space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/events/${eventId}`}>
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Pay Your Share</h1>
-            <p className="text-muted-foreground">{event.title}</p>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/events/${eventId}`}
+            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+          >
+            <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
+          </Link>
+          <div className="flex-1">
+            <h1 className="text-lg font-bold text-[rgb(var(--color-text))]">
+              Pay Your Share
+            </h1>
+            <p className="text-sm text-[rgb(var(--color-text-secondary))]">
+              {event.title}
+            </p>
+          </div>
+          <button
+            onClick={copyShareLink}
+            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+          >
+            <Share2 className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
+          </button>
+        </div>
+
+        {/* Total Summary Card */}
+        <div className="card-mobile p-5 bg-gradient-to-br from-[rgb(var(--color-primary))]/20 to-[rgb(var(--color-accent))]/20 border-[rgb(var(--color-primary))]/30">
+          <div className="text-center">
+            <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-1">
+              Total Amount Due
+            </p>
+            <p className="text-4xl font-bold text-[rgb(var(--color-primary))] mb-1">
+              {formatThaiCurrency(totalOwed)}
+            </p>
+            <p className="text-sm text-[rgb(var(--color-text-secondary))]">
+              {pendingSplits.length} expense{pendingSplits.length !== 1 ? 's' : ''} to pay
+            </p>
           </div>
         </div>
 
-        {/* Total Summary */}
-        <Card className="bg-primary/5 border-primary/20">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-1">Total Amount Due</p>
-              <p className="text-4xl font-bold text-primary">{formatThaiCurrency(totalOwed)}</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                {pendingSplits.length} expense{pendingSplits.length !== 1 ? 's' : ''} to pay
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Payment Options */}
+        {/* Payment Content */}
         {pendingSplits.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">All Caught Up!</h3>
-              <p className="text-muted-foreground mb-4">
-                You have paid all your shares for this event.
-              </p>
-              <Button asChild>
-                <Link href={`/events/${eventId}`}>Back to Event</Link>
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="card-mobile p-8 text-center">
+            <div className="h-20 w-20 rounded-full bg-[rgb(var(--color-success))]/10 flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-10 w-10 text-[rgb(var(--color-success))]" />
+            </div>
+            <h3 className="text-xl font-bold text-[rgb(var(--color-text))] mb-2">
+              All Caught Up!
+            </h3>
+            <p className="text-[rgb(var(--color-text-secondary))] mb-6">
+              You have paid all your shares for this event.
+            </p>
+            <Link href={`/events/${eventId}`}>
+              <button className="btn-primary w-full">
+                Back to Event
+              </button>
+            </Link>
+          </div>
         ) : (
           <>
-            {/* Split Selector */}
+            {/* Expense Selector - Horizontal Scroll */}
             {pendingSplits.length > 1 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Select Expense to Pay</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {pendingSplits.map((split) => {
-                      const owed = split.amount_owed - split.amount_paid
-                      return (
-                        <button
-                          key={split.id}
-                          onClick={() => setSelectedSplitId(split.id)}
-                          className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                            selectedSplitId === split.id
-                              ? 'bg-primary/10 border-primary'
-                              : 'hover:bg-accent/50'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className="font-medium">{split.expense_title}</div>
-                              <div className="text-sm text-muted-foreground">
-                                Paid by {split.payer?.nickname || 'Unknown'}
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <div className="font-bold">{formatThaiCurrency(owed)}</div>
-                              <Badge variant="outline" className="text-xs">
-                                {split.status}
-                              </Badge>
-                            </div>
-                          </div>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-3">
+                <h2 className="text-sm font-semibold text-[rgb(var(--color-text-secondary))] px-1">
+                  Select Expense to Pay
+                </h2>
+                <div className="flex gap-3 overflow-x-auto snap-x-mobile pb-2 scrollbar-hide">
+                  {pendingSplits.map((split) => {
+                    const owed = split.amount_owed - split.amount_paid
+                    const isSelected = selectedSplitId === split.id
+
+                    return (
+                      <button
+                        key={split.id}
+                        onClick={() => setSelectedSplitId(split.id)}
+                        className={cn(
+                          'flex-shrink-0 w-36 card-mobile p-4 text-left transition-all touch-feedback active:scale-[0.98]',
+                          isSelected
+                            ? 'border-[rgb(var(--color-primary))] bg-[rgb(var(--color-primary))]/10'
+                            : ''
+                        )}
+                      >
+                        <div className="text-xs text-[rgb(var(--color-text-tertiary))] mb-1 truncate">
+                          {split.expense_title}
+                        </div>
+                        <div className="font-bold text-[rgb(var(--color-text))]">
+                          {formatThaiCurrency(owed)}
+                        </div>
+                        <div className="text-xs text-[rgb(var(--color-text-secondary))] mt-1">
+                          Pay to {split.payer?.nickname || 'Unknown'}
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             )}
 
             {/* QR Code Display */}
             {selectedSplit && (
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">PromptPay QR Code</CardTitle>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="icon" onClick={copyShareLink}>
-                        <Copy className="h-4 w-4" />
-                      </Button>
-                      {qrData?.qr_code && (
-                        <Button variant="outline" size="icon" onClick={downloadQR}>
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
+              <div className="card-mobile overflow-hidden">
+                {/* QR Code Section */}
+                <div className="p-5">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="font-semibold text-[rgb(var(--color-text))]">
+                      PromptPay QR Code
+                    </h2>
+                    {qrData?.qr_code && (
+                      <button
+                        onClick={downloadQR}
+                        className="h-9 px-3 rounded-lg bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text-secondary))] text-sm font-medium touch-feedback active:scale-95 transition-all flex items-center gap-1.5"
+                      >
+                        <Download className="h-4 w-4" />
+                        Save
+                      </button>
+                    )}
                   </div>
-                </CardHeader>
-                <CardContent>
+
                   {qrLoading ? (
-                    <div className="flex justify-center py-8">
-                      <div className="animate-pulse h-64 w-64 bg-muted rounded-lg" />
+                    <div className="flex justify-center py-12">
+                      <div className="animate-pulse h-64 w-64 bg-[rgb(var(--color-border))] rounded-2xl"></div>
                     </div>
                   ) : qrData?.qr_code ? (
-                    <div className="space-y-4">
+                    <div className="space-y-5">
+                      {/* QR Code Image */}
                       <div className="flex justify-center">
-                        <div className="bg-white p-4 rounded-lg shadow-sm">
+                        <div className="bg-white p-4 rounded-2xl shadow-xl">
                           <Image
                             src={qrData.qr_code}
                             alt="PromptPay QR Code"
                             width={256}
                             height={256}
-                            className="w-64 h-64"
+                            className="w-56 h-56"
                           />
                         </div>
                       </div>
 
-                      <div className="text-center space-y-2">
-                        <p className="text-2xl font-bold">{formatThaiCurrency(amountOwed)}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Pay to: <span className="font-medium">{qrData.payer_name}</span>
+                      {/* Amount Display */}
+                      <div className="text-center">
+                        <p className="text-3xl font-bold text-[rgb(var(--color-primary))]">
+                          {formatThaiCurrency(amountOwed)}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-sm text-[rgb(var(--color-text-secondary))] mt-1">
+                          Pay to{' '}
+                          <span className="font-medium text-[rgb(var(--color-text))]">
+                            {qrData.payer_name}
+                          </span>
+                        </p>
+                        <p className="text-xs text-[rgb(var(--color-text-tertiary))] mt-0.5">
                           {qrData.expense_title}
                         </p>
                       </div>
 
-                      <div className="bg-muted/50 rounded-lg p-4 text-sm space-y-2">
-                        <p className="font-medium">How to pay:</p>
-                        <ol className="space-y-1 text-muted-foreground list-decimal list-inside">
-                          <li>Open your banking app (K Plus, SCB Easy, etc.)</li>
-                          <li>Scan the QR code above</li>
-                          <li>Confirm the payment amount</li>
-                          <li>Complete the transfer</li>
-                        </ol>
-                      </div>
+                      {/* Instructions Toggle */}
+                      <button
+                        onClick={() => setShowInstructions(!showInstructions)}
+                        className="w-full p-4 rounded-xl bg-[rgb(var(--color-bg-alt))] text-left touch-feedback active:scale-[0.99] transition-all"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-[rgb(var(--color-text))] text-sm">
+                            How to pay with PromptPay
+                          </span>
+                          <QrCode className="h-5 w-5 text-[rgb(var(--color-primary))]" />
+                        </div>
+                      </button>
 
-                      <Button
-                        className="w-full"
-                        size="lg"
+                      {showInstructions && (
+                        <div className="p-4 rounded-xl bg-[rgb(var(--color-bg-alt))] space-y-3">
+                          <ol className="space-y-3 text-sm text-[rgb(var(--color-text-secondary))]">
+                            <li className="flex items-start gap-3">
+                              <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
+                                1
+                              </span>
+                              <span>Open your banking app (K Plus, SCB Easy, etc.)</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                              <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
+                                2
+                              </span>
+                              <span>Select "Scan QR" or "PromptPay" feature</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                              <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
+                                3
+                              </span>
+                              <span>Scan the QR code above</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                              <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
+                                4
+                              </span>
+                              <span>Confirm the payment amount and transfer</span>
+                            </li>
+                          </ol>
+                        </div>
+                      )}
+
+                      {/* Mark as Paid Button */}
+                      <button
+                        className="btn-primary w-full py-4 text-base font-semibold flex items-center justify-center gap-2"
                         onClick={handleMarkAsPaid}
                         disabled={markAsPaid.isPending}
                       >
@@ -256,20 +311,24 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                           'Marking...'
                         ) : (
                           <>
-                            <CheckCircle className="mr-2 h-4 w-4" />
+                            <CheckCircle className="h-5 w-5" />
                             Mark as Paid
                           </>
                         )}
-                      </Button>
+                      </button>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <QrCode className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No PromptPay ID set for the payer</p>
+                    <div className="text-center py-12">
+                      <div className="h-16 w-16 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-4">
+                        <QrCode className="h-8 w-8 text-[rgb(var(--color-text-tertiary)]" />
+                      </div>
+                      <p className="text-[rgb(var(--color-text-secondary))]">
+                        No PromptPay ID set for the payer
+                      </p>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
           </>
         )}

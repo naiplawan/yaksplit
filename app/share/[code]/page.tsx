@@ -3,14 +3,12 @@
 import { useState } from 'react'
 import { useEventByCode } from '@/lib/hooks/useEvents'
 import { Container } from '@/components/layout/Container'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Users, Calendar, QrCode, Download, Share2 } from 'lucide-react'
+import { Users, Calendar, QrCode, Share2, Crown, Sparkles } from 'lucide-react'
 import { formatThaiCurrency } from '@/lib/utils/format'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import Image from 'next/image'
 import Link from 'next/link'
 
 export default function SharePage({ params }: { params: Promise<{ code: string }> }) {
@@ -25,13 +23,6 @@ export default function SharePage({ params }: { params: Promise<{ code: string }
     navigator.clipboard.writeText(window.location.href)
   }
 
-  const downloadQR = (qrCode: string) => {
-    const link = document.createElement('a')
-    link.href = qrCode
-    link.download = `promptpay-${code}.png`
-    link.click()
-  }
-
   if (!resolvedParams) {
     return null
   }
@@ -39,10 +30,10 @@ export default function SharePage({ params }: { params: Promise<{ code: string }
   if (isLoading) {
     return (
       <Container>
-        <div className="py-16 flex justify-center">
-          <div className="animate-pulse space-y-4 w-full max-w-md">
-            <div className="h-8 bg-muted rounded w-1/2" />
-            <div className="h-64 bg-muted rounded" />
+        <div className="py-16 safe-area-pt flex justify-center">
+          <div className="animate-pulse flex flex-col items-center gap-4">
+            <div className="h-16 w-16 rounded-full bg-[rgb(var(--color-border))]"></div>
+            <div className="h-6 w-32 rounded-full bg-[rgb(var(--color-border))]"></div>
           </div>
         </div>
       </Container>
@@ -51,186 +42,206 @@ export default function SharePage({ params }: { params: Promise<{ code: string }
 
   if (error || !event) {
     return (
-      <Container size="sm">
-        <div className="py-16 text-center">
-          <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
-            <QrCode className="h-8 w-8 text-muted-foreground" />
+      <Container>
+        <div className="py-16 safe-area-pt text-center">
+          <div className="h-20 w-20 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-6">
+            <QrCode className="h-10 w-10 text-[rgb(var(--color-text-tertiary)]" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Event Not Found</h1>
-          <p className="text-muted-foreground mb-6">
+          <h1 className="text-2xl font-bold text-[rgb(var(--color-text))] mb-2">
+            Event Not Found
+          </h1>
+          <p className="text-[rgb(var(--color-text-secondary))] mb-8 px-4">
             This share link may be invalid or the event has been deleted.
           </p>
-          <Button asChild>
-            <Link href="/">Go Home</Link>
-          </Button>
+          <Link href="/">
+            <button className="btn-primary">
+              Go to YakSplit
+            </button>
+          </Link>
         </div>
       </Container>
     )
   }
 
-  // Calculate totals for each member
-  const memberTotals = event.members.map((member) => {
-    // This would normally come from expense data, but for the share page
-    // we'll show a simplified view
-    return {
-      ...member,
-      totalOwed: 0, // Would be calculated from actual splits
-      totalPaid: 0,
-    }
-  })
-
   return (
-    <Container size="md">
-      <div className="py-8 space-y-6">
+    <Container>
+      <div className="py-4 safe-area-pt space-y-6">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary/10">
+        <div className="text-center space-y-4 pt-4">
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-[rgb(var(--color-primary))]/10">
             <span className="text-3xl">฿</span>
           </div>
           <div>
-            <h1 className="text-3xl font-bold">{event.title}</h1>
+            <h1 className="text-2xl font-bold text-[rgb(var(--color-text))]">
+              {event.title}
+            </h1>
             {event.description && (
-              <p className="text-muted-foreground mt-2">{event.description}</p>
+              <p className="text-[rgb(var(--color-text-secondary))] mt-2">
+                {event.description}
+              </p>
             )}
           </div>
-          <Badge variant="outline" className="text-sm">
-            Share Code: {event.share_code}
-          </Badge>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--color-bg-alt))]">
+            <QrCode className="h-4 w-4 text-[rgb(var(--color-primary))]" />
+            <span className="font-mono font-semibold text-[rgb(var(--color-primary))]">
+              {event.share_code}
+            </span>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="flex items-center justify-center gap-6 py-2">
+          <div className="flex items-center gap-2 text-sm text-[rgb(var(--color-text-secondary))]">
+            <Users className="h-4 w-4" />
+            <span>{event.members.length} members</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-[rgb(var(--color-text-secondary))]">
+            <Calendar className="h-4 w-4" />
+            <span>{new Date(event.created_at).toLocaleDateString('th-TH')}</span>
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4">
-          <Button variant="outline" onClick={copyLink}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Copy Link
-          </Button>
-          <Button asChild>
-            <Link href="/login">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={copyLink}
+            className="flex-1 h-12 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text))] font-medium flex items-center justify-center gap-2 touch-feedback active:scale-[0.98] transition-all border border-[rgb(var(--color-border-light))]"
+          >
+            <Share2 className="h-5 w-5" />
+            <span>Copy Link</span>
+          </button>
+          <Link href="/login" className="flex-1">
+            <button className="btn-primary h-12 w-full">
               Join Event
-            </Link>
-          </Button>
+            </button>
+          </Link>
         </div>
 
-        {/* Event Info */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{event.members.length} members</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{new Date(event.created_at).toLocaleDateString('th-TH')}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Tabs */}
-        <Tabs defaultValue="members">
-          <TabsList className="grid w-full max-w-sm mx-auto grid-cols-2">
-            <TabsTrigger value="members">Members</TabsTrigger>
-            <TabsTrigger value="info">Event Info</TabsTrigger>
+        <Tabs defaultValue="members" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2 bg-[rgb(var(--color-bg-alt))] p-1 rounded-xl">
+            <TabsTrigger
+              value="members"
+              className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+            >
+              Members
+            </TabsTrigger>
+            <TabsTrigger
+              value="info"
+              className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+            >
+              About
+            </TabsTrigger>
           </TabsList>
 
           {/* Members Tab */}
           <TabsContent value="members" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Event Members</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {event.members.map((member) => (
-                    <div key={member.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarFallback className="bg-primary/10">
-                            {member.nickname.charAt(0).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <div className="font-medium">{member.nickname}</div>
-                          {member.promptpay_id && (
-                            <div className="text-xs text-muted-foreground">
-                              PromptPay: {member.promptpay_id}
-                            </div>
-                          )}
-                        </div>
+            <div className="space-y-3">
+              {event.members.map((member) => (
+                <div
+                  key={member.id}
+                  className="card-mobile p-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-11 w-11">
+                      <AvatarFallback className="bg-[rgb(var(--color-primary))]/10 text-[rgb(var(--color-primary))] text-sm font-medium">
+                        {member.nickname.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium text-[rgb(var(--color-text))] flex items-center gap-2">
+                        {member.nickname}
+                        {member.role === 'creator' && (
+                          <Crown className="h-3.5 w-3.5 text-[rgb(var(--color-secondary))]" />
+                        )}
                       </div>
-                      <Badge variant={member.role === 'creator' ? 'default' : 'secondary'}>
-                        {member.role}
-                      </Badge>
+                      {member.promptpay_id && (
+                        <div className="text-xs text-[rgb(var(--color-text-secondary))]">
+                          PromptPay connected
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  </div>
+                  {member.role === 'creator' && (
+                    <span className="px-2 py-1 rounded-full bg-[rgb(var(--color-secondary))]/20 text-[rgb(var(--color-secondary))] text-xs font-medium">
+                      Host
+                    </span>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
           </TabsContent>
 
           {/* Info Tab */}
           <TabsContent value="info" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">About YakSplit</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  YakSplit makes it easy to split bills with friends in Bangkok.
-                  Generate PromptPay QR codes for each person and settle up in seconds.
+            <div className="card-mobile p-5 space-y-4">
+              <div className="text-center pb-4 border-b border-[rgb(var(--color-border-light))]">
+                <div className="h-12 w-12 rounded-full bg-[rgb(var(--color-primary))]/10 flex items-center justify-center mx-auto mb-3">
+                  <Sparkles className="h-6 w-6 text-[rgb(var(--color-primary))]" />
+                </div>
+                <h3 className="font-semibold text-[rgb(var(--color-text))]">
+                  What is YakSplit?
+                </h3>
+                <p className="text-sm text-[rgb(var(--color-text-secondary))] mt-2">
+                  The easiest way to split bills with friends in Bangkok
                 </p>
+              </div>
 
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <QrCode className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">Instant QR Codes</div>
-                      <div className="text-xs text-muted-foreground">
-                        Scan with any Thai banking app
-                      </div>
-                    </div>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-[rgb(var(--color-primary))]/10 flex items-center justify-center flex-shrink-0">
+                    <QrCode className="h-5 w-5 text-[rgb(var(--color-primary))]" />
                   </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Users className="h-4 w-4 text-primary" />
+                  <div>
+                    <div className="font-medium text-[rgb(var(--color-text))] text-sm">
+                      Instant QR Codes
                     </div>
-                    <div>
-                      <div className="font-medium text-sm">No App Required</div>
-                      <div className="text-xs text-muted-foreground">
-                        Friends can view and pay without logging in
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">Flexible Splitting</div>
-                      <div className="text-xs text-muted-foreground">
-                        Equal, custom amounts, or percentages
-                      </div>
+                    <div className="text-xs text-[rgb(var(--color-text-secondary))] mt-1">
+                      Scan with K Plus, SCB Easy, or any Thai banking app
                     </div>
                   </div>
                 </div>
 
-                <Button className="w-full" asChild>
-                  <Link href="/login">
-                    Create Your Own Event
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-[rgb(var(--color-accent))]/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="h-5 w-5 text-[rgb(var(--color-accent))]" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-[rgb(var(--color-text))] text-sm">
+                      No App Required
+                    </div>
+                    <div className="text-xs text-[rgb(var(--color-text-secondary))] mt-1">
+                      Friends can view and pay without logging in
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-[rgb(var(--color-secondary))]/10 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="h-5 w-5 text-[rgb(var(--color-secondary))]" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-[rgb(var(--color-text))] text-sm">
+                      Flexible Splitting
+                    </div>
+                    <div className="text-xs text-[rgb(var(--color-text-secondary))] mt-1">
+                      Equal split, custom amounts, or percentages
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Link href="/login">
+                <button className="btn-primary w-full py-3 mt-4">
+                  Create Your Own Event
+                </button>
+              </Link>
+            </div>
           </TabsContent>
         </Tabs>
 
         {/* Footer */}
-        <div className="text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-[rgb(var(--color-text-tertiary))] py-4">
           <p>Powered by YakSplit • Made with ใจ in Bangkok 🇹🇭</p>
         </div>
       </div>

@@ -9,147 +9,417 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
 }
 
+/* Mobile-First Design Tokens for YakSplit */
 :root {
-  --radius: 0.625rem;
-  /* Thai-inspired colors */
-  --background: 252 252 248; /* Rice White (#FAF8F8) */
-  --foreground: 45 35 50; /* Dark purple-gray */
-
-  --card: 255 255 255;
-  --card-foreground: 45 35 50;
-
-  --popover: 255 255 255;
-  --popover-foreground: 45 35 50;
-
-  /* Thai Purple (#6B4C9A) - Primary brand color */
-  --primary: 107 76 154;
-  --primary-foreground: 255 255 255;
+  /* === Thai-Inspired Color System === */
+  /* Thai Purple (#6B4C9A) - Primary brand */
+  --color-primary: 107 76 154;
+  --color-primary-light: 140 110 180;
+  --color-primary-dark: 85 55 120;
 
   /* Temple Gold (#D4A843) - Secondary accent */
-  --secondary: 212 168 67;
-  --secondary-foreground: 45 35 50;
+  --color-secondary: 212 168 67;
+  --color-secondary-light: 230 190 100;
 
-  --muted: 245 242 238;
-  --muted-foreground: 120 110 120;
+  /* Lotus Pink (#E8917C) - Accent */
+  --color-accent: 232 145 124;
+  --color-accent-light: 245 170 150;
 
-  /* Lotus Pink (#E8917C) - Accent color */
-  --accent: 232 145 124;
-  --accent-foreground: 45 35 50;
+  /* Thai Green - Success */
+  --color-success: 78 160 130;
 
-  --destructive: 220 50 50;
-  --destructive-foreground: 255 255 255;
+  /* Thai Orange - Warning */
+  --color-warning: 245 180 90;
 
-  --border: 230 225 220;
-  --input: 230 225 220;
-  --ring: 107 76 154;
+  /* Error */
+  --color-error: 220 80 80;
 
-  --chart-1: 232 145 124; /* Lotus Pink */
-  --chart-2: 212 168 67; /* Temple Gold */
-  --chart-3: 107 76 154; /* Thai Purple */
-  --chart-4: 78 160 130; /* Thai Green */
-  --chart-5: 245 180 90; /* Thai Orange */
+  /* === Base Colors === */
+  --color-bg: 252 252 248;        /* Rice White */
+  --color-bg-alt: 245 242 238;    /* Warm gray */
+  --color-card: 255 255 255;
 
-  --sidebar: 250 248 245;
-  --sidebar-foreground: 45 35 50;
-  --sidebar-primary: 107 76 154;
-  --sidebar-primary-foreground: 255 255 255;
-  --sidebar-accent: 245 242 238;
-  --sidebar-accent-foreground: 45 35 50;
-  --sidebar-border: 230 225 220;
-  --sidebar-ring: 107 76 154;
+  /* Text colors with WCAG AA contrast */
+  --color-text: 45 35 50;         /* Primary text */
+  --color-text-secondary: 90 85 95;  /* Secondary text */
+  --color-text-tertiary: 150 145 155; /* Tertiary text */
+  --color-text-inverse: 255 255 255;
+
+  /* Border colors */
+  --color-border-light: 240 235 230;
+  --color-border: 230 225 220;
+
+  /* === Spacing - Mobile First === */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 32px;
+  --spacing-4xl: 40px;
+
+  /* Safe area for mobile */
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+  --safe-area-left: env(safe-area-inset-left);
+  --safe-area-right: env(safe-area-inset-right);
+
+  /* === Border Radius === */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* === Touch Target (44px minimum) === */
+  --touch-target: 44px;
+  --touch-target-lg: 48px;
+  --touch-target-xl: 52px;
+
+  /* === Shadows === */
+  --shadow-sm: 0 1px 2px rgba(107, 76, 154, 0.05);
+  --shadow-md: 0 4px 8px rgba(107, 76, 154, 0.08);
+  --shadow-lg: 0 8px 24px rgba(107, 76, 154, 0.12);
+  --shadow-xl: 0 16px 48px rgba(107, 76, 154, 0.16);
+
+  /* === Z-Index === */
+  --z-base: 0;
+  --z-above: 10;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
 }
 
+/* Dark Mode */
 .dark {
-  --background: 35 25 45;
-  --foreground: 250 248 245;
+  --color-bg: 15 12 22;
+  --color-bg-alt: 20 17 28;
+  --color-card: 25 22 32;
 
-  --card: 50 40 60;
-  --card-foreground: 250 248 245;
+  --color-text: 250 248 245;
+  --color-text-secondary: 190 185 200;
+  --color-text-tertiary: 140 135 150;
 
-  --popover: 50 40 60;
-  --popover-foreground: 250 248 245;
+  --color-border: 45 40 55;
+  --color-border-light: 35 30 42;
 
-  /* Thai Purple - lighter for dark mode */
-  --primary: 140 110 180;
-  --primary-foreground: 35 25 45;
-
-  /* Temple Gold - adjusted for dark mode */
-  --secondary: 180 150 80;
-  --secondary-foreground: 35 25 45;
-
-  --muted: 60 50 70;
-  --muted-foreground: 180 170 190;
-
-  /* Lotus Pink - adjusted for dark mode */
-  --accent: 230 150 140;
-  --accent-foreground: 35 25 45;
-
-  --destructive: 250 100 100;
-  --destructive-foreground: 35 25 45;
-
-  --border: 70 60 80;
-  --input: 70 60 80;
-  --ring: 140 110 180;
-
-  --chart-1: 230 150 140;
-  --chart-2: 180 150 80;
-  --chart-3: 140 110 180;
-  --chart-4: 120 180 150;
-  --chart-5: 220 170 110;
-
-  --sidebar: 40 30 50;
-  --sidebar-foreground: 250 248 245;
-  --sidebar-primary: 140 110 180;
-  --sidebar-primary-foreground: 35 25 45;
-  --sidebar-accent: 60 50 70;
-  --sidebar-accent-foreground: 250 248 245;
-  --sidebar-border: 70 60 80;
-  --sidebar-ring: 140 110 180;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: rgb(var(--color-border));
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+
+  /* Touch-friendly tap target sizing */
+  button, a, [role="button"], [role="link"] {
+    min-height: var(--touch-target);
+    min-width: var(--touch-target);
+  }
+
+  /* Remove minimum width from text inputs and buttons where appropriate */
+  button[type="submit"], .btn-icon {
+    min-width: unset;
+  }
+}
+
+/* === Mobile-First Utilities === */
+.safe-area-p {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+.safe-area-pt {
+  padding-top: var(--safe-area-top);
+}
+
+.safe-area-pb {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* Touch-friendly buttons */
+.btn-touch {
+  min-height: var(--touch-target);
+  min-width: var(--touch-target);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.glass-dark {
+  background: rgba(15, 12, 22, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Thai gradient */
+.gradient-thai {
+  background: linear-gradient(135deg, rgb(var(--color-primary)) 0%, rgb(var(--color-accent)) 100%);
+}
+
+.gradient-thai-subtle {
+  background: linear-gradient(180deg, rgba(var(--color-primary), 0.05) 0%, transparent 100%);
+}
+
+/* Typography scale */
+.text-hero {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .text-hero {
+    font-size: 64px;
+    line-height: 1.1;
+  }
+}
+
+.text-section {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .text-section {
+    font-size: 32px;
+  }
+}
+
+/* Card shadows */
+.card-mobile {
+  border-radius: 16px;
+  border: 1px solid rgb(var(--color-border-light));
+  background-color: rgb(var(--color-card));
+  box-shadow: var(--shadow-md);
+}
+
+/* Scroll snapping for mobile */
+.snap-x-mobile {
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--spacing-lg);
+}
+
+.snap-center-mobile {
+  scroll-snap-type: x mandatory;
+  scroll-snap-align: center;
+  scroll-padding-inline: max(50% - var(--touch-target-lg) / 2, var(--spacing-lg));
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Bottom safe area for mobile */
+.pb-safe {
+  padding-bottom: calc(var(--spacing-4xl) + var(--safe-area-bottom));
+}
+
+/* Touch feedback */
+.touch-feedback {
+  transition: transform 100ms ease-out;
+}
+
+.touch-feedback:active {
+  transform: scale(0.97);
+}
+
+/* Floating action button */
+.fab {
+  height: 56px;
+  width: 56px;
+  border-radius: 9999px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 100ms ease-out;
+}
+
+.fab:active {
+  transform: scale(0.97);
+}
+
+/* Mobile container */
+.container-mobile {
+  width: 100%;
+  max-width: 430px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-lg);
+}
+
+/* Desktop container */
+@media (min-width: 768px) {
+  .container-mobile {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-mobile {
+    max-width: 1024px;
+  }
+}
+
+/* Component-specific styles */
+
+/* Primary button */
+.btn-primary {
+  background-color: rgb(var(--color-primary));
+  color: white;
+  border-radius: 9999px;
+  padding: 12px 24px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transition: background-color 200ms ease, transform 100ms ease-out;
+}
+
+.btn-primary:hover {
+  background-color: rgb(var(--color-primary-dark));
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* Secondary button */
+.btn-secondary {
+  background-color: rgb(var(--color-bg-alt));
+  color: rgb(var(--color-text));
+  border-radius: 9999px;
+  padding: 12px 24px;
+  font-weight: 600;
+  border: 1px solid rgb(var(--color-border));
+  transition: background-color 200ms ease, transform 100ms ease-out;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(var(--color-border));
+}
+
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+
+/* Icon button */
+.btn-icon {
+  height: 48px;
+  width: 48px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 200ms ease, transform 100ms ease-out;
+}
+
+.btn-icon-ghost:hover {
+  background-color: rgb(var(--color-bg-alt));
+}
+
+.btn-icon:active {
+  transform: scale(0.97);
+}
+
+/* Card component */
+.card-mobile {
+  border-radius: 16px;
+  border: 1px solid rgb(var(--color-border-light));
+  background-color: rgb(var(--color-card));
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 200ms ease;
+}
+
+.card-mobile:active {
+  box-shadow: var(--shadow-md);
+}
+
+/* Input fields */
+.input-mobile {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgb(var(--color-border));
+  background-color: rgb(var(--color-bg));
+  padding: 12px 16px;
+  font-size: 16px;
+  min-height: var(--touch-target);
+  transition: all 200ms ease;
+}
+
+.input-mobile:focus {
+  outline: none;
+  ring: 2px solid rgb(var(--color-primary-light));
+  border-color: transparent;
+}
+
+/* Bottom sheet animation */
+.bottom-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-radius: 24px 24px 0 0;
+  background-color: rgb(var(--color-card));
+  box-shadow: var(--shadow-xl);
+  transform: translateY(0);
+  transition: transform 300ms ease-out;
+  padding-bottom: var(--safe-area-bottom);
+}
+
+.bottom-sheet.closed {
+  transform: translateY(100%);
+}
+
+/* Swipeable card */
+.swipeable-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipeable-card:active {
+  transform: scale(0.97);
+  transition: transform 100ms ease-out;
+}
+
+.swipeable-card .swipe-indicator {
+  width: 4px;
+  height: 32px;
+  border-radius: 9999px;
+  background-color: rgb(var(--color-border));
+  margin: 8px auto 0;
 }

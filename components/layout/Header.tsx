@@ -2,10 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Bell, Settings } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Bell, Settings, X, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface HeaderProps {
@@ -17,134 +15,85 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const pathname = usePathname()
-
   const isLandingPage = pathname === '/'
-  const isAuthPage = pathname?.startsWith('/(auth)')
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Events', href: '/events' },
-    { name: 'Friends', href: '/friends' },
-    { name: 'Profile', href: '/profile' },
-  ]
-
+  // Simplified header for landing page
   if (isLandingPage) {
     return (
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <span className="text-xl font-bold text-primary-foreground">฿</span>
+      <header className="sticky top-0 z-50 w-full bg-[rgb(var(--color-bg))]/80 backdrop-blur-md border-b border-[rgb(var(--color-border-light))]">
+        <div className="container-mobile">
+          <div className="flex h-14 items-center justify-between">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 touch-feedback">
+              <div className="h-10 w-10 rounded-full bg-[rgb(var(--color-primary))] flex items-center justify-center">
+                <span className="text-lg font-bold text-white">฿</span>
+              </div>
+              <span className="text-lg font-bold text-[rgb(var(--color-text))]">YakSplit</span>
+            </Link>
+
+            {/* Auth buttons */}
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <button className="btn-secondary text-sm px-4 py-2">
+                  Log in
+                </button>
+              </Link>
+              <Link href="/login">
+                <button className="btn-primary text-sm px-4 py-2">
+                  Get Started
+                </button>
+              </Link>
             </div>
-            <span className="text-xl font-bold">YakSplit</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-6">
-            <Link href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              How it works
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/login">Get started</Link>
-            </Button>
           </div>
         </div>
       </header>
     )
   }
 
+  // App header (authenticated pages)
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/dashboard" className="flex items-center space-x-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">฿</span>
-          </div>
-          <span className="text-lg font-bold hidden sm:inline-block">YakSplit</span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navigation.map((item) => {
-            const isActive = pathname?.startsWith(item.href)
-            return (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive ? 'secondary' : 'ghost'}
-                  className={cn(
-                    'justify-start',
-                    isActive && 'bg-secondary'
-                  )}
-                >
-                  {item.name}
-                </Button>
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* Desktop Actions */}
-        <div className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/profile">
-              <Settings className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Link href="/profile">
-            <Avatar className="h-9 w-9">
-              <AvatarImage src={user?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                {user?.display_name?.charAt(0).toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
+    <header className="sticky top-0 z-50 w-full bg-[rgb(var(--color-bg))]/80 backdrop-blur-md border-b border-[rgb(var(--color-border-light))]">
+      <div className="container-mobile">
+        <div className="flex h-14 items-center justify-between">
+          {/* Logo */}
+          <Link href="/dashboard" className="flex items-center gap-2 touch-feedback">
+            <div className="h-9 w-9 rounded-full bg-[rgb(var(--color-primary))] flex items-center justify-center">
+              <span className="text-base font-bold text-white">฿</span>
+            </div>
+            <span className="font-semibold text-[rgb(var(--color-text))] hidden sm:block">
+              YakSplit
+            </span>
           </Link>
-        </div>
 
-        {/* Mobile Navigation */}
-        <div className="flex md:hidden items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
+          {/* Right actions */}
+          <div className="flex items-center gap-1">
+            {/* Search button */}
+            <button className="btn-icon btn-icon-ghost">
+              <Search className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
+            </button>
+
+            {/* Notifications */}
+            <button className="btn-icon btn-icon-ghost relative">
+              <Bell className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
+              <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[rgb(var(--color-accent))]"></span>
+            </button>
+
+            {/* Settings */}
             <Link href="/profile">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-                  {user?.display_name?.charAt(0).toUpperCase() || 'U'}
+              <button className="btn-icon btn-icon-ghost hidden sm:block">
+                <Settings className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
+              </button>
+            </Link>
+
+            {/* Avatar - links to profile */}
+            <Link href="/profile" className="touch-feedback">
+              <Avatar className="h-9 w-9 border-2 border-[rgb(var(--color-border))]">
+                <AvatarFallback className="bg-[rgb(var(--color-primary))] text-white text-xs font-medium">
+                  {user?.display_name?.charAt(0).toUpperCase() || 'Y'}
                 </AvatarFallback>
               </Avatar>
             </Link>
-          </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right">
-              <nav className="flex flex-col gap-2 mt-8">
-                {navigation.map((item) => {
-                  const isActive = pathname?.startsWith(item.href)
-                  return (
-                    <Link key={item.href} href={item.href}>
-                      <Button
-                        variant={isActive ? 'secondary' : 'ghost'}
-                        className={cn('w-full justify-start', isActive && 'bg-secondary')}
-                      >
-                        {item.name}
-                      </Button>
-                    </Link>
-                  )
-                })}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          </div>
         </div>
       </div>
     </header>
