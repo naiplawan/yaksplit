@@ -1,26 +1,155 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.625rem;
+  /* Thai-inspired colors */
+  --background: 252 252 248; /* Rice White (#FAF8F8) */
+  --foreground: 45 35 50; /* Dark purple-gray */
+
+  --card: 255 255 255;
+  --card-foreground: 45 35 50;
+
+  --popover: 255 255 255;
+  --popover-foreground: 45 35 50;
+
+  /* Thai Purple (#6B4C9A) - Primary brand color */
+  --primary: 107 76 154;
+  --primary-foreground: 255 255 255;
+
+  /* Temple Gold (#D4A843) - Secondary accent */
+  --secondary: 212 168 67;
+  --secondary-foreground: 45 35 50;
+
+  --muted: 245 242 238;
+  --muted-foreground: 120 110 120;
+
+  /* Lotus Pink (#E8917C) - Accent color */
+  --accent: 232 145 124;
+  --accent-foreground: 45 35 50;
+
+  --destructive: 220 50 50;
+  --destructive-foreground: 255 255 255;
+
+  --border: 230 225 220;
+  --input: 230 225 220;
+  --ring: 107 76 154;
+
+  --chart-1: 232 145 124; /* Lotus Pink */
+  --chart-2: 212 168 67; /* Temple Gold */
+  --chart-3: 107 76 154; /* Thai Purple */
+  --chart-4: 78 160 130; /* Thai Green */
+  --chart-5: 245 180 90; /* Thai Orange */
+
+  --sidebar: 250 248 245;
+  --sidebar-foreground: 45 35 50;
+  --sidebar-primary: 107 76 154;
+  --sidebar-primary-foreground: 255 255 255;
+  --sidebar-accent: 245 242 238;
+  --sidebar-accent-foreground: 45 35 50;
+  --sidebar-border: 230 225 220;
+  --sidebar-ring: 107 76 154;
+}
+
+.dark {
+  --background: 35 25 45;
+  --foreground: 250 248 245;
+
+  --card: 50 40 60;
+  --card-foreground: 250 248 245;
+
+  --popover: 50 40 60;
+  --popover-foreground: 250 248 245;
+
+  /* Thai Purple - lighter for dark mode */
+  --primary: 140 110 180;
+  --primary-foreground: 35 25 45;
+
+  /* Temple Gold - adjusted for dark mode */
+  --secondary: 180 150 80;
+  --secondary-foreground: 35 25 45;
+
+  --muted: 60 50 70;
+  --muted-foreground: 180 170 190;
+
+  /* Lotus Pink - adjusted for dark mode */
+  --accent: 230 150 140;
+  --accent-foreground: 35 25 45;
+
+  --destructive: 250 100 100;
+  --destructive-foreground: 35 25 45;
+
+  --border: 70 60 80;
+  --input: 70 60 80;
+  --ring: 140 110 180;
+
+  --chart-1: 230 150 140;
+  --chart-2: 180 150 80;
+  --chart-3: 140 110 180;
+  --chart-4: 120 180 150;
+  --chart-5: 220 170 110;
+
+  --sidebar: 40 30 50;
+  --sidebar-foreground: 250 248 245;
+  --sidebar-primary: 140 110 180;
+  --sidebar-primary-foreground: 35 25 45;
+  --sidebar-accent: 60 50 70;
+  --sidebar-accent-foreground: 250 248 245;
+  --sidebar-border: 70 60 80;
+  --sidebar-ring: 140 110 180;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground;
+  }
 }

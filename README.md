@@ -1,36 +1,151 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YakSplit 💸
+
+> *"Yak" (แยก) means "to split" or "to separate" in Thai*
+
+A modern bill-splitting app designed for Bangkok users, featuring PromptPay QR code generation for easy peer-to-peer payments.
+
+## Features
+
+- **PromptPay QR Codes**: Generate unique QR codes for each person to scan with their Thai banking app (K Plus, SCB Easy, Krungthai NEXT, etc.)
+- **Quick Splits**: Create events and split bills in under 30 seconds
+- **Share Links**: Send a link to friends - they can view their split and pay without logging in
+- **Flexible Splitting**: Split equally, custom amounts, or by percentage
+- **Mobile-First Design**: Optimized for phone screens, perfect for use at restaurants and bars
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Database**: Supabase (PostgreSQL)
+- **Auth**: Supabase Auth (Phone + OTP)
+- **State**: React Query (TanStack Query)
+- **Validation**: Zod
+- **QR Generation**: promptpay-qr + qrcode libraries
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ and npm
+- A Supabase project (get one free at [supabase.com](https://supabase.com))
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd yaksplit
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env.local` and add your Supabase credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
 
-## Learn More
+4. Run database migrations:
+```bash
+# If using Supabase CLI
+supabase db push
 
-To learn more about Next.js, take a look at the following resources:
+# Or manually run the SQL in supabase/migrations/001_initial_schema.sql
+# in your Supabase SQL editor
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Run the development server:
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Deploy on Vercel
+## Project Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+yaksplit/
+├── app/                        # Next.js App Router
+│   ├── (auth)/                # Auth routes
+│   ├── (main)/                # Main app routes (dashboard, events, etc.)
+│   ├── share/[code]/          # Public share page
+│   ├── api/                   # API routes
+│   ├── layout.tsx             # Root layout
+│   └── page.tsx               # Landing page
+├── components/
+│   ├── ui/                    # shadcn/ui components
+│   ├── layout/                # Header, BottomNav, Container
+│   ├── event/                 # Event-related components
+│   ├── expense/               # Expense-related components
+│   └── payment/               # Payment-related components
+├── lib/
+│   ├── supabase/              # Supabase clients (browser, server, admin)
+│   ├── qr/                    # PromptPay QR generation
+│   ├── utils/                 # Utility functions
+│   ├── services/              # Service layer (EventService, ExpenseService)
+│   ├── hooks/                 # React Query hooks
+│   └── validations/           # Zod schemas
+├── types/                     # TypeScript type definitions
+└── supabase/
+    └── migrations/            # Database migrations
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Database Schema
+
+- `users` - User profiles
+- `events` - Bill split events
+- `event_members` - Event participants
+- `expenses` - Individual expenses
+- `splits` - How expenses are divided
+- `payments` - Payment records
+- `friendships` - User friendships
+
+## API Routes
+
+### Events
+- `GET /api/events` - List user's events
+- `POST /api/events` - Create new event
+- `GET /api/events/[id]` - Get event details
+- `PUT /api/events/[id]` - Update event
+- `DELETE /api/events/[id]` - Delete event
+- `GET /api/events/code/[code]` - Get event by share code
+
+### Members
+- `GET /api/events/[id]/members` - List event members
+- `POST /api/events/[id]/members` - Add member
+- `PUT /api/events/[id]/members/[mid]` - Update member
+- `DELETE /api/events/[id]/members/[mid]` - Remove member
+
+### Expenses
+- `GET /api/events/[id]/expenses` - List event expenses
+- `POST /api/events/[id]/expenses` - Create expense
+- `GET /api/expenses/[id]` - Get expense details
+- `PUT /api/expenses/[id]` - Update expense
+- `DELETE /api/expenses/[id]` - Delete expense
+
+### Splits & Payments
+- `GET /api/splits/[id]/qr` - Generate PromptPay QR code
+- `PUT /api/splits/[id]` - Mark split as paid
+- `POST /api/splits/[id]/payment` - Record payment
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is open source and available under the MIT License.
+
+---
+
+Made with ใจ in Bangkok 🇹🇭
