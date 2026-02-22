@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryClientProvider } from "@/app/providers/query-provider";
@@ -17,15 +17,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+  themeColor: "#FF6B2C",
+};
+
 export const metadata: Metadata = {
   title: "YakSplit - Bill Splitting with PromptPay",
   description: "Split bills easily with friends in Bangkok. Generate PromptPay QR codes for each person. No login required.",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover",
-  themeColor: "#6B4C9A",
   icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180" },
+    ],
+    other: [
+      { rel: "mask-icon", url: "/icon.svg", color: "#FF6B2C" },
+    ],
   },
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -35,6 +50,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

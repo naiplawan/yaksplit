@@ -1,0 +1,25 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="40" fill="#FF6B2C"/>
+
+  <!-- Thai Baht Symbol ฿ -->
+  <g fill="white">
+    <!-- Vertical stroke -->
+    <rect x="82" y="24" width="16" height="132" rx="4"/>
+
+    <!-- Top horizontal -->
+    <rect x="50" y="40" width="80" height="14" rx="4"/>
+
+    <!-- Middle horizontal -->
+    <rect x="50" y="84" width="72" height="14" rx="4"/>
+
+    <!-- Bottom horizontal -->
+    <rect x="50" y="128" width="80" height="14" rx="4"/>
+
+    <!-- Left vertical -->
+    <rect x="50" y="40" width="14" height="102" rx="4"/>
+
+    <!-- Right curves -->
+    <rect x="116" y="54" width="14" height="32" rx="7"/>
+    <rect x="116" y="98" width="14" height="32" rx="7"/>
+  </g>
+</svg>

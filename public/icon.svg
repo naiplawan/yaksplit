@@ -1,0 +1,26 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="108" fill="#FF6B2C"/>
+
+  <!-- Thai Baht Symbol ฿ -->
+  <g fill="white">
+    <!-- Vertical stroke -->
+    <rect x="230" y="80" width="36" height="352" rx="10"/>
+
+    <!-- Top horizontal -->
+    <rect x="140" y="120" width="200" height="36" rx="10"/>
+
+    <!-- Middle horizontal -->
+    <rect x="140" y="240" width="180" height="36" rx="10"/>
+
+    <!-- Bottom horizontal -->
+    <rect x="140" y="360" width="200" height="36" rx="10"/>
+
+    <!-- Left vertical (stem of B) -->
+    <rect x="140" y="120" width="36" height="276" rx="10"/>
+
+    <!-- Right curves - approximated with rectangles for small size clarity -->
+    <rect x="304" y="156" width="36" height="88" rx="18"/>
+    <rect x="304" y="276" width="36" height="88" rx="18"/>
+  </g>
+</svg>
