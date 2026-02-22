@@ -11,12 +11,12 @@ import {
   TrendingDown,
   ArrowUpRight,
   Users,
+  Wallet,
 } from 'lucide-react'
 import Link from 'next/link'
 import { EventCard } from '@/components/event/EventCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { SkeletonDashboard } from '@/components/ui/skeleton'
-import { Amount, AmountBalance } from '@/components/ui/amount'
 import { formatThaiCurrency, formatRelativeTime } from '@/lib/utils/format'
 
 export default function DashboardPage() {
@@ -26,10 +26,10 @@ export default function DashboardPage() {
   const completedEvents = events?.filter((e) => e.status === 'completed') || []
   const totalMembers = events?.reduce((sum, e) => sum + (e.members?.length || 0), 0) || 0
 
-  // Calculate mock balance (in real app, this would come from the backend)
+  // Mock balance data (in real app, this would come from the backend)
   const mockBalance = {
-    owed: 1250, // Money owed to you
-    owing: 350, // Money you owe
+    owed: 1250,
+    owing: 350,
   }
   const netBalance = mockBalance.owed - mockBalance.owing
 
@@ -63,11 +63,11 @@ export default function DashboardPage() {
 
   return (
     <Container>
-      <div className="py-4 safe-area-pt space-y-6">
+      <div className="py-6 safe-area-pt space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-[rgb(var(--color-text-secondary))]">
+            <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-1">
               สวัสดี
             </p>
             <h1 className="text-2xl font-bold text-[rgb(var(--color-text))]">
@@ -76,38 +76,45 @@ export default function DashboardPage() {
           </div>
           <Link
             href="/events/new"
-            className="h-11 px-4 rounded-full bg-[rgb(var(--color-primary))] text-white text-sm font-semibold flex items-center gap-2 shadow-lg shadow-[rgb(var(--color-primary))]/30 touch-feedback active:scale-95 transition-all"
+            className="h-11 px-5 rounded-lg bg-[var(--color-brand-primary-500)] text-white text-sm font-semibold flex items-center gap-2 touch-feedback active:scale-98 transition-all"
           >
             <Plus className="h-5 w-5" />
             <span>สร้าง</span>
           </Link>
         </div>
 
-        {/* Balance Summary Card - Prominent display */}
-        <div className="card-elevated overflow-hidden">
-          {/* Gradient header */}
-          <div className="gradient-thai p-6 text-white">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-white/80 text-sm mb-1">ยอดคงเหลือสุทธิ</p>
-                <h2 className="text-4xl font-bold tracking-tight">
-                  {netBalance >= 0 ? '+' : ''}{formatThaiCurrency(netBalance)}
-                </h2>
-              </div>
-              <div className="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center">
-                {netBalance >= 0 ? (
-                  <TrendingUp className="h-6 w-6" />
-                ) : (
-                  <TrendingDown className="h-6 w-6" />
-                )}
-              </div>
+        {/* Balance Summary Card - Clean design */}
+        <div className="card-elevated">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-1">
+                ยอดคงเหลือสุทธิ
+              </p>
+              <h2 className={`text-3xl font-bold tracking-tight ${
+                netBalance >= 0
+                  ? 'text-[var(--color-semantic-success-500)]'
+                  : 'text-[var(--color-semantic-error-500)]'
+              }`}>
+                {netBalance >= 0 ? '+' : ''}{formatThaiCurrency(netBalance)}
+              </h2>
+            </div>
+            <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
+              netBalance >= 0
+                ? 'bg-[var(--color-semantic-success-100)]'
+                : 'bg-[var(--color-semantic-error-100)]'
+            }`}>
+              {netBalance >= 0 ? (
+                <TrendingUp className="h-6 w-6 text-[var(--color-semantic-success-500)]" />
+              ) : (
+                <TrendingDown className="h-6 w-6 text-[var(--color-semantic-error-500)]" />
+              )}
             </div>
           </div>
 
           {/* Balance breakdown */}
-          <div className="p-4 grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-[var(--color-semantic-success-500)] mb-1">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[rgb(var(--color-border-light))]">
+            <div>
+              <div className="flex items-center gap-1.5 text-[var(--color-semantic-success-500)] mb-1">
                 <ArrowUpRight className="h-4 w-4" />
                 <span className="text-xs font-medium">คุณได้รับ</span>
               </div>
@@ -115,8 +122,8 @@ export default function DashboardPage() {
                 {formatThaiCurrency(mockBalance.owed)}
               </p>
             </div>
-            <div className="text-center border-l border-[rgb(var(--color-border-light))]">
-              <div className="flex items-center justify-center gap-1 text-[var(--color-semantic-error-500)] mb-1">
+            <div className="pl-4 border-l border-[rgb(var(--color-border-light))]">
+              <div className="flex items-center gap-1.5 text-[var(--color-semantic-error-500)] mb-1">
                 <TrendingDown className="h-4 w-4" />
                 <span className="text-xs font-medium">คุณต้องจ่าย</span>
               </div>
@@ -127,17 +134,17 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Actions - 2x2 Grid */}
+        {/* Quick Actions */}
         <section>
-          <h2 className="text-lg font-semibold text-[rgb(var(--color-text))] mb-3">
+          <h2 className="text-base font-semibold text-[rgb(var(--color-text))] mb-4">
             ทางลัด
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {/* Create Event */}
             <Link href="/events/new" className="block">
               <div className="card-interactive p-4 h-full">
-                <div className="h-14 w-14 rounded-2xl mb-3 flex items-center justify-center bg-[var(--color-brand-primary-500)] text-white shadow-lg shadow-[var(--color-brand-primary-500)]/30">
-                  <Plus className="h-7 w-7" />
+                <div className="h-12 w-12 rounded-xl mb-3 flex items-center justify-center bg-[var(--color-brand-primary-100)]">
+                  <Plus className="h-6 w-6 text-[var(--color-brand-primary-500)]" />
                 </div>
                 <h3 className="font-semibold text-[rgb(var(--color-text))] mb-1">
                   สร้างกิจกรรม
@@ -151,8 +158,8 @@ export default function DashboardPage() {
             {/* Scan QR */}
             <Link href="/scan" className="block">
               <div className="card-interactive p-4 h-full">
-                <div className="h-14 w-14 rounded-2xl mb-3 flex items-center justify-center bg-[var(--color-brand-accent-500)] text-white shadow-lg shadow-[var(--color-brand-accent-500)]/30">
-                  <QrCode className="h-7 w-7" />
+                <div className="h-12 w-12 rounded-xl mb-3 flex items-center justify-center bg-[var(--color-brand-accent-100)]">
+                  <QrCode className="h-6 w-6 text-[var(--color-brand-accent-600)]" />
                 </div>
                 <h3 className="font-semibold text-[rgb(var(--color-text))] mb-1">
                   สแกน QR
@@ -166,8 +173,8 @@ export default function DashboardPage() {
             {/* History */}
             <Link href="/events?filter=all" className="block">
               <div className="card-interactive p-4 h-full">
-                <div className="h-14 w-14 rounded-2xl mb-3 flex items-center justify-center bg-[var(--color-brand-secondary-500)] text-white shadow-lg shadow-[var(--color-brand-secondary-500)]/30">
-                  <History className="h-7 w-7" />
+                <div className="h-12 w-12 rounded-xl mb-3 flex items-center justify-center bg-[var(--color-brand-secondary-100)]">
+                  <History className="h-6 w-6 text-[var(--color-brand-secondary-600)]" />
                 </div>
                 <h3 className="font-semibold text-[rgb(var(--color-text))] mb-1">
                   ประวัติ
@@ -178,10 +185,10 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            {/* Members Stats */}
-            <div className="card-interactive p-4 h-full bg-gradient-to-br from-[var(--surface-card)] to-[var(--color-brand-primary-50)]">
-              <div className="h-14 w-14 rounded-2xl mb-3 flex items-center justify-center bg-[var(--color-semantic-success-500)] text-white shadow-lg shadow-[var(--color-semantic-success-500)]/30">
-                <Users className="h-7 w-7" />
+            {/* Stats */}
+            <div className="card-interactive p-4 h-full">
+              <div className="h-12 w-12 rounded-xl mb-3 flex items-center justify-center bg-[var(--color-semantic-success-100)]">
+                <Users className="h-6 w-6 text-[var(--color-semantic-success-500)]" />
               </div>
               <h3 className="font-semibold text-[rgb(var(--color-text))] mb-1">
                 {totalMembers} คน
@@ -193,25 +200,25 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* Active Events Section */}
+        {/* Active Events */}
         <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-[rgb(var(--color-text))]">
               กิจกรรมที่กำลังดำเนิน
             </h2>
             {activeEvents.length > 0 && (
               <Link href="/events" className="flex items-center">
-                <span className="text-sm text-[rgb(var(--color-primary))] font-medium">
+                <span className="text-sm text-[var(--color-brand-primary-500)] font-medium">
                   ดูทั้งหมด
                 </span>
-                <ChevronRight className="h-4 w-4 text-[rgb(var(--color-primary))]" />
+                <ChevronRight className="h-4 w-4 text-[var(--color-brand-primary-500)]" />
               </Link>
             )}
           </div>
 
           {activeEvents.length === 0 ? (
             <EmptyState
-              icon={<Plus className="h-12 w-12" />}
+              icon={<Wallet className="h-12 w-12" />}
               title="ยังไม่มีกิจกรรม"
               description="สร้างกิจกรรมแรกเพื่อเริ่มแบ่งค่าใช้จ่ายกับเพื่อน"
               action={{
@@ -228,18 +235,18 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* Recent Activity - Horizontal scroll */}
+        {/* Recent Activity */}
         {completedEvents.length > 0 && (
           <section>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-[rgb(var(--color-text))]">
                 เสร็จสิ้นล่าสุด
               </h2>
               <Link href="/events?filter=completed" className="flex items-center">
-                <span className="text-sm text-[rgb(var(--color-primary))] font-medium">
+                <span className="text-sm text-[var(--color-brand-primary-500)] font-medium">
                   ดูทั้งหมด
                 </span>
-                <ChevronRight className="h-4 w-4 text-[rgb(var(--color-primary))]" />
+                <ChevronRight className="h-4 w-4 text-[var(--color-brand-primary-500)]" />
               </Link>
             </div>
 
@@ -252,7 +259,7 @@ export default function DashboardPage() {
                 >
                   <div className="card-interactive p-4 h-full">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="h-10 w-10 rounded-xl bg-[var(--color-semantic-success-500)]/10 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-xl bg-[var(--color-semantic-success-100)] flex items-center justify-center">
                         <History className="h-5 w-5 text-[var(--color-semantic-success-500)]" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -268,7 +275,7 @@ export default function DashboardPage() {
                       <span className="text-[rgb(var(--color-text-secondary))]">
                         {event.members?.length || 0} คน
                       </span>
-                      <span className="badge-success px-2 py-1 rounded-full text-xs font-medium">
+                      <span className="badge-success">
                         เสร็จสิ้น
                       </span>
                     </div>

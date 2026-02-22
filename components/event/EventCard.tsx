@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
-import { Amount } from '@/components/ui/amount'
 import { formatRelativeTime } from '@/lib/utils/format'
 
 interface EventCardProps {
@@ -27,17 +26,14 @@ interface EventCardProps {
     }>
   }
   showActions?: boolean
-  /** Show compact version for lists */
   compact?: boolean
-  /** Mock total amount (in real app, this comes from expenses) */
   mockTotal?: number
-  /** Mock paid amount (in real app, this comes from expenses) */
   mockPaid?: number
 }
 
 /**
- * Enhanced EventCard with progress bar and member avatars
- * Inspired by Splitwise's clean card design
+ * EventCard - Clean Minimal Style
+ * Splitwise-inspired with warm orange accents
  */
 export function EventCard({
   event,
@@ -50,11 +46,9 @@ export function EventCard({
   const shareCode = event.share_code || '----'
   const isCompleted = event.status === 'completed'
 
-  // Calculate progress
   const progressPercentage = mockTotal > 0 ? Math.round((mockPaid / mockTotal) * 100) : 0
   const remaining = mockTotal - mockPaid
 
-  // Get first 3 members for avatar stack
   const displayMembers = event.members?.slice(0, 3) || []
   const remainingMembers = Math.max(0, memberCount - 3)
 
@@ -62,12 +56,11 @@ export function EventCard({
     return (
       <Link href={`/events/${event.id}`} className="block touch-feedback">
         <div className="card-interactive p-3 flex items-center gap-3">
-          {/* Status indicator */}
           <div
             className={`h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
               isCompleted
-                ? 'bg-[var(--color-semantic-success-500)]/10'
-                : 'bg-[var(--color-brand-primary-500)]/10'
+                ? 'bg-[var(--color-semantic-success-100)]'
+                : 'bg-[var(--color-brand-primary-100)]'
             }`}
           >
             {isCompleted ? (
@@ -77,7 +70,6 @@ export function EventCard({
             )}
           </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-[rgb(var(--color-text))] truncate">
               {event.title}
@@ -87,13 +79,12 @@ export function EventCard({
               {mockTotal > 0 && (
                 <>
                   <span>·</span>
-                  <Amount value={mockTotal} size="sm" />
+                  <span>฿{mockTotal.toLocaleString()}</span>
                 </>
               )}
             </div>
           </div>
 
-          {/* Arrow */}
           <ChevronRight className="h-5 w-5 text-[rgb(var(--color-text-tertiary))] flex-shrink-0" />
         </div>
       </Link>
@@ -102,7 +93,7 @@ export function EventCard({
 
   return (
     <Link href={`/events/${event.id}`} className="block touch-feedback">
-      <div className="card-interactive p-4 transition-all duration-200">
+      <div className="card-interactive p-4">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
@@ -111,7 +102,7 @@ export function EventCard({
                 {event.title}
               </h3>
               {isCompleted && (
-                <span className="flex-shrink-0 badge-success px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
+                <span className="badge-success flex-shrink-0 flex items-center gap-1">
                   <CheckCircle className="h-3 w-3" />
                   เสร็จ
                 </span>
@@ -124,41 +115,38 @@ export function EventCard({
             )}
           </div>
 
-          {/* Share code badge */}
-          <code className="ml-2 px-2 py-1 rounded-lg bg-[var(--color-brand-primary-500)]/10 text-[var(--color-brand-primary-600)] font-mono text-xs flex-shrink-0">
+          <code className="ml-2 px-2 py-1 rounded-lg bg-[var(--color-brand-primary-100)] text-[var(--color-brand-primary-600)] font-mono text-xs flex-shrink-0">
             {shareCode}
           </code>
         </div>
 
-        {/* Progress bar (if amounts available) */}
+        {/* Progress bar */}
         {mockTotal > 0 && (
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-[rgb(var(--color-text-secondary))]">
                 ชำระแล้ว {progressPercentage}%
               </span>
-              <div className="flex items-center gap-1 text-xs">
-                <Amount value={mockPaid} size="sm" />
-                <span className="text-[rgb(var(--color-text-tertiary))]">/</span>
-                <Amount value={mockTotal} size="sm" />
-              </div>
+              <span className="text-xs font-medium text-[rgb(var(--color-text))]">
+                ฿{mockPaid.toLocaleString()} / ฿{mockTotal.toLocaleString()}
+              </span>
             </div>
             <Progress
               value={progressPercentage}
-              variant={isCompleted ? 'success' : 'gradient'}
+              variant={isCompleted ? 'success' : 'primary'}
               size="sm"
             />
             {remaining > 0 && !isCompleted && (
               <p className="text-xs text-[rgb(var(--color-text-tertiary))] mt-1.5">
-                คงเหลือ <Amount value={remaining} size="sm" />
+                คงเหลือ ฿{remaining.toLocaleString()}
               </p>
             )}
           </div>
         )}
 
-        {/* Footer with members and meta */}
+        {/* Footer */}
         <div className="flex items-center justify-between">
-          {/* Member avatars stack */}
+          {/* Member avatars */}
           <div className="flex items-center gap-2">
             {memberCount > 0 ? (
               <div className="flex -space-x-2">
@@ -170,8 +158,8 @@ export function EventCard({
                     <AvatarFallback
                       className="text-xs font-medium"
                       style={{
-                        backgroundColor: `hsl(${(index * 137.5) % 360}, 60%, 70%)`,
-                        color: `hsl(${(index * 137.5) % 360}, 60%, 30%)`,
+                        backgroundColor: `hsl(${(index * 137.5) % 360}, 70%, 85%)`,
+                        color: `hsl(${(index * 137.5) % 360}, 70%, 35%)`,
                       }}
                     >
                       {member.nickname.charAt(0).toUpperCase()}
@@ -179,7 +167,7 @@ export function EventCard({
                   </Avatar>
                 ))}
                 {remainingMembers > 0 && (
-                  <div className="h-7 w-7 rounded-full bg-[rgb(var(--color-bg-alt))] border-2 border-[var(--surface-card)] flex items-center justify-center">
+                  <div className="h-7 w-7 rounded-full bg-[var(--surface-background-alt)] border-2 border-[var(--surface-card)] flex items-center justify-center">
                     <span className="text-xs font-medium text-[rgb(var(--color-text-secondary))]">
                       +{remainingMembers}
                     </span>
@@ -194,7 +182,7 @@ export function EventCard({
             )}
           </div>
 
-          {/* Meta info */}
+          {/* Meta */}
           <div className="flex items-center gap-3 text-xs text-[rgb(var(--color-text-tertiary))]">
             <div className="flex items-center gap-1">
               <Users className="h-3.5 w-3.5" />
@@ -213,14 +201,14 @@ export function EventCard({
             <Link
               href={`/events/${event.id}/pay`}
               onClick={(e) => e.stopPropagation()}
-              className="flex-1 h-11 rounded-xl bg-gradient-to-r from-[var(--color-brand-primary-500)] to-[var(--color-brand-accent-400)] text-white text-sm font-semibold text-center flex items-center justify-center touch-feedback active:scale-95 transition-all shadow-md"
+              className="flex-1 h-11 rounded-lg bg-[var(--color-brand-primary-500)] text-white text-sm font-semibold text-center flex items-center justify-center touch-feedback active:scale-98 transition-all"
             >
               จ่ายส่วนของฉัน
             </Link>
             <Link
               href={`/events/${event.id}`}
               onClick={(e) => e.stopPropagation()}
-              className="h-11 px-4 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text-secondary))] font-medium text-sm touch-feedback active:scale-95 transition-all border border-[rgb(var(--color-border-light))]"
+              className="h-11 px-4 rounded-lg bg-[var(--surface-background-alt)] text-[rgb(var(--color-text-secondary))] font-medium text-sm touch-feedback active:scale-98 transition-all border border-[rgb(var(--color-border-light))]"
             >
               รายละเอียด
             </Link>
@@ -231,9 +219,6 @@ export function EventCard({
   )
 }
 
-/**
- * Skeleton for EventCard loading state
- */
 export function EventCardSkeleton() {
   return (
     <div className="card-mobile p-4 animate-pulse">

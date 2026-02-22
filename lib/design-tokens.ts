@@ -1,13 +1,14 @@
 /**
  * YakSplit Design System Tokens
  *
- * Based on competitor research (Splitwise, Tricount, SettleUp, Heypenny)
- * and 2025 fintech design trends.
+ * Style: Clean Minimal (Splitwise-inspired)
+ * Primary: Warm Orange - friendly, approachable
  *
- * Color palette inspired by Thai aesthetics:
- * - Primary: Thai Purple (#6B4C9A)
- * - Secondary: Temple Gold (#D4A843)
- * - Accent: Lotus Pink (#E8917C)
+ * Design Principles:
+ * - Lots of white space
+ * - Subtle shadows, no heavy gradients
+ * - Muted secondary colors
+ * - Simple, flat design with soft edges
  */
 
 // ============================================================================
@@ -15,89 +16,89 @@
 // ============================================================================
 
 export const colors = {
-  // Brand Colors - Thai Purple Scale
+  // Brand Colors - Warm Orange Scale
   brand: {
     primary: {
-      50: '#f5f3f9',
-      100: '#e8e3f1',
-      200: '#d4cce4',
-      300: '#b8a9d1',
-      400: '#9b82ba',
-      500: '#6B4C9A', // Main Thai Purple
-      600: '#5a3f82',
-      700: '#4a336b',
-      800: '#3a2754',
-      900: '#2a1b3d',
-      950: '#1a0f26',
+      50: '#fff8f4',
+      100: '#ffede0',
+      200: '#ffd9bf',
+      300: '#ffb88a',
+      400: '#ff9054',
+      500: '#FF6B2C', // Main Warm Orange
+      600: '#f04f1a',
+      700: '#c93d14',
+      800: '#a33114',
+      900: '#862a16',
+      950: '#48140a',
     },
     secondary: {
-      50: '#fcf8eb',
-      100: '#f8f0cf',
-      200: '#f1e19e',
-      300: '#e9cb5e',
-      400: '#D4A843', // Temple Gold
-      500: '#c49a3b',
-      600: '#a37f30',
-      700: '#7d6125',
-      800: '#5a461b',
-      900: '#3d2f12',
-      950: '#261e0c',
+      50: '#f8fafc',
+      100: '#f1f5f9',
+      200: '#e2e8f0',
+      300: '#cbd5e1',
+      400: '#94a3b8',
+      500: '#64748b', // Slate gray - neutral secondary
+      600: '#475569',
+      700: '#334155',
+      800: '#1e293b',
+      900: '#0f172a',
+      950: '#020617',
     },
     accent: {
-      50: '#fef5f3',
-      100: '#fee8e4',
-      200: '#fdd5cd',
-      300: '#fbb8aa',
-      400: '#E8917C', // Lotus Pink
-      500: '#d47d68',
-      600: '#c0644e',
-      700: '#a04d3a',
-      800: '#7d3c2d',
-      900: '#5c2c21',
-      950: '#3b1c15',
+      50: '#fefce8',
+      100: '#fef9c3',
+      200: '#fef08a',
+      300: '#fde047',
+      400: '#facc15', // Soft yellow accent
+      500: '#eab308',
+      600: '#ca8a04',
+      700: '#a16207',
+      800: '#854d0e',
+      900: '#713f12',
+      950: '#422006',
     },
   },
 
   // Semantic Colors
   semantic: {
     success: {
-      50: '#edfaf4',
-      100: '#d5f4e6',
-      200: '#aee9d1',
-      300: '#73d8b4',
-      400: '#4EA082', // Thai Green
-      500: '#3a8c6e',
-      600: '#2a7158',
-      700: '#225a46',
-      800: '#1e4939',
-      900: '#1a3c30',
-      950: '#0d251b',
+      50: '#f0fdf4',
+      100: '#dcfce7',
+      200: '#bbf7d0',
+      300: '#86efac',
+      400: '#4ade80',
+      500: '#22c55e',
+      600: '#16a34a',
+      700: '#15803d',
+      800: '#166534',
+      900: '#14532d',
+      950: '#052e16',
     },
     warning: {
-      50: '#fff8ed',
-      100: '#ffefcf',
-      200: '#ffdf9e',
-      300: '#fccb5e',
-      400: '#F5B45A', // Thai Orange
-      500: '#e19a3d',
-      600: '#c07c2a',
-      700: '#9a5f20',
-      800: '#7d4c1b',
-      900: '#653f17',
-      950: '#3d250d',
+      50: '#fffbeb',
+      100: '#fef3c7',
+      200: '#fde68a',
+      300: '#fcd34d',
+      400: '#fbbf24',
+      500: '#f59e0b',
+      600: '#d97706',
+      700: '#b45309',
+      800: '#92400e',
+      900: '#78350f',
+      950: '#451a03',
     },
     error: {
-      50: '#feefef',
-      100: '#fddeed',
-      200: '#fcbeda',
-      300: '#f88eb8',
-      400: '#DC5050', // Error Red
-      500: '#c83030',
-      600: '#a82222',
-      700: '#8a1b1b',
-      800: '#721919',
-      900: '#5f1818',
-      950: '#3a0b0b',
+      50: '#fef2f2',
+      100: '#fee2e2',
+      200: '#fecaca',
+      300: '#fca5a5',
+      400: '#f87171',
+      500: '#ef4444',
+      600: '#dc2626',
+      700: '#b91c1c',
+      800: '#991b1b',
+      900: '#7f1d1d',
+      950: '#450a0a',
     },
     info: {
       50: '#eff6ff',
@@ -114,36 +115,36 @@ export const colors = {
     },
   },
 
-  // Neutral Colors
+  // Neutral Colors - Warm gray scale
   neutral: {
-    50: '#fcfcf8',  // Rice White
-    100: '#f5f2ee', // Warm Gray
-    200: '#e8e4df',
-    300: '#d4cfc8',
-    400: '#b8b0a8',
-    500: '#948d85',
-    600: '#7a746c',
-    700: '#635d56',
-    800: '#524c46',
-    900: '#45403b',
-    950: '#2d2926',
+    50: '#fafaf9',   // Warm white
+    100: '#f5f5f4',  // Light warm gray
+    200: '#e7e5e4',
+    300: '#d6d3d1',
+    400: '#a8a29e',
+    500: '#78716c',
+    600: '#57534e',
+    700: '#44403c',
+    800: '#292524',
+    900: '#1c1917',
+    950: '#0c0a09',
   },
 
   // Surface Colors (for light/dark mode)
   surface: {
     light: {
-      background: '#fcfcf8',
-      backgroundAlt: '#f5f2ee',
+      background: '#ffffff',
+      backgroundAlt: '#fafaf9',
       card: '#ffffff',
       elevated: '#ffffff',
-      overlay: 'rgba(0, 0, 0, 0.5)',
+      overlay: 'rgba(0, 0, 0, 0.4)',
     },
     dark: {
-      background: '#0f0c16',
-      backgroundAlt: '#15111c',
-      card: '#1a1622',
-      elevated: '#201c28',
-      overlay: 'rgba(0, 0, 0, 0.7)',
+      background: '#0c0a09',
+      backgroundAlt: '#1c1917',
+      card: '#292524',
+      elevated: '#292524',
+      overlay: 'rgba(0, 0, 0, 0.6)',
     },
   },
 } as const
@@ -195,13 +196,13 @@ export const typography = {
 export const textStyles = {
   // Display
   display1: {
-    fontSize: '2.25rem',   // 36px
+    fontSize: '2.25rem',
     fontWeight: '700',
     lineHeight: '1.1',
     letterSpacing: '-0.02em',
   },
   display2: {
-    fontSize: '1.875rem',  // 30px
+    fontSize: '1.875rem',
     fontWeight: '700',
     lineHeight: '1.15',
     letterSpacing: '-0.02em',
@@ -209,52 +210,52 @@ export const textStyles = {
 
   // Headings
   heading1: {
-    fontSize: '1.5rem',    // 24px
+    fontSize: '1.5rem',
     fontWeight: '600',
     lineHeight: '1.25',
     letterSpacing: '-0.01em',
   },
   heading2: {
-    fontSize: '1.25rem',   // 20px
+    fontSize: '1.25rem',
     fontWeight: '600',
     lineHeight: '1.3',
   },
   heading3: {
-    fontSize: '1.125rem',  // 18px
+    fontSize: '1.125rem',
     fontWeight: '600',
     lineHeight: '1.4',
   },
 
   // Body
   bodyLg: {
-    fontSize: '1.125rem',  // 18px
+    fontSize: '1.125rem',
     fontWeight: '400',
     lineHeight: '1.5',
   },
   body: {
-    fontSize: '1rem',      // 16px
+    fontSize: '1rem',
     fontWeight: '400',
     lineHeight: '1.5',
   },
   bodySm: {
-    fontSize: '0.875rem',  // 14px
+    fontSize: '0.875rem',
     fontWeight: '400',
     lineHeight: '1.5',
   },
 
   // Labels
   label: {
-    fontSize: '0.875rem',  // 14px
+    fontSize: '0.875rem',
     fontWeight: '500',
     lineHeight: '1.4',
   },
   labelSm: {
-    fontSize: '0.75rem',   // 12px
+    fontSize: '0.75rem',
     fontWeight: '500',
     lineHeight: '1.4',
   },
   overline: {
-    fontSize: '0.625rem',  // 10px
+    fontSize: '0.625rem',
     fontWeight: '600',
     lineHeight: '1.4',
     letterSpacing: '0.1em',
@@ -263,7 +264,7 @@ export const textStyles = {
 
   // Caption
   caption: {
-    fontSize: '0.75rem',   // 12px
+    fontSize: '0.75rem',
     fontWeight: '400',
     lineHeight: '1.4',
   },
@@ -275,25 +276,25 @@ export const textStyles = {
 
 export const spacing = {
   0: '0',
-  0.5: '0.125rem',  // 2px
-  1: '0.25rem',     // 4px
-  1.5: '0.375rem',  // 6px
-  2: '0.5rem',      // 8px
-  2.5: '0.625rem',  // 10px
-  3: '0.75rem',     // 12px
-  3.5: '0.875rem',  // 14px
-  4: '1rem',        // 16px
-  5: '1.25rem',     // 20px
-  6: '1.5rem',      // 24px
-  7: '1.75rem',     // 28px
-  8: '2rem',        // 32px
-  9: '2.25rem',     // 36px
-  10: '2.5rem',     // 40px
-  12: '3rem',       // 48px
-  14: '3.5rem',     // 56px
-  16: '4rem',       // 64px
-  20: '5rem',       // 80px
-  24: '6rem',       // 96px
+  0.5: '0.125rem',
+  1: '0.25rem',
+  1.5: '0.375rem',
+  2: '0.5rem',
+  2.5: '0.625rem',
+  3: '0.75rem',
+  3.5: '0.875rem',
+  4: '1rem',
+  5: '1.25rem',
+  6: '1.5rem',
+  7: '1.75rem',
+  8: '2rem',
+  9: '2.25rem',
+  10: '2.5rem',
+  12: '3rem',
+  14: '3.5rem',
+  16: '4rem',
+  20: '5rem',
+  24: '6rem',
 } as const
 
 // ============================================================================
@@ -302,34 +303,30 @@ export const spacing = {
 
 export const radius = {
   none: '0',
-  sm: '0.5rem',     // 8px
-  md: '0.75rem',    // 12px
-  lg: '1rem',       // 16px
-  xl: '1.25rem',    // 20px
-  '2xl': '1.5rem',  // 24px
-  '3xl': '2rem',    // 32px
+  sm: '0.375rem',   // 6px - subtle
+  md: '0.5rem',     // 8px - standard
+  lg: '0.75rem',    // 12px - cards
+  xl: '1rem',       // 16px - buttons
+  '2xl': '1.25rem', // 20px - larger elements
+  '3xl': '1.5rem',  // 24px - modals
   full: '9999px',
 } as const
 
 // ============================================================================
-// SHADOW TOKENS
+// SHADOW TOKENS - Subtle, minimal shadows
 // ============================================================================
 
 export const shadows = {
   none: 'none',
-  sm: '0 1px 2px rgba(107, 76, 154, 0.05)',
-  md: '0 4px 8px rgba(107, 76, 154, 0.08)',
-  lg: '0 8px 24px rgba(107, 76, 154, 0.12)',
-  xl: '0 16px 48px rgba(107, 76, 154, 0.16)',
-  '2xl': '0 24px 64px rgba(107, 76, 154, 0.20)',
-  // Glow effects
-  glowPrimary: '0 0 20px rgba(107, 76, 154, 0.3)',
-  glowSuccess: '0 0 20px rgba(78, 160, 130, 0.3)',
-  glowError: '0 0 20px rgba(220, 80, 80, 0.3)',
-  // Dark mode shadows
-  darkSm: '0 1px 2px rgba(0, 0, 0, 0.3)',
-  darkMd: '0 4px 8px rgba(0, 0, 0, 0.4)',
-  darkLg: '0 8px 24px rgba(0, 0, 0, 0.5)',
+  sm: '0 1px 2px rgba(0, 0, 0, 0.04)',
+  md: '0 2px 4px rgba(0, 0, 0, 0.06)',
+  lg: '0 4px 8px rgba(0, 0, 0, 0.08)',
+  xl: '0 8px 16px rgba(0, 0, 0, 0.1)',
+  '2xl': '0 12px 24px rgba(0, 0, 0, 0.12)',
+  // Subtle colored shadows
+  glowPrimary: '0 2px 8px rgba(255, 107, 44, 0.15)',
+  glowSuccess: '0 2px 8px rgba(34, 197, 94, 0.15)',
+  glowError: '0 2px 8px rgba(239, 68, 68, 0.15)',
 } as const
 
 // ============================================================================
@@ -349,7 +346,6 @@ export const animation = {
     in: 'cubic-bezier(0.4, 0, 1, 1)',
     out: 'cubic-bezier(0, 0, 0.2, 1)',
     inOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-    bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
   },
 } as const
 
@@ -373,24 +369,11 @@ export const zIndex = {
 } as const
 
 // ============================================================================
-// BREAKPOINTS
-// ============================================================================
-
-export const breakpoints = {
-  xs: '320px',
-  sm: '375px',
-  md: '425px',
-  lg: '768px',
-  xl: '1024px',
-  '2xl': '1280px',
-} as const
-
-// ============================================================================
 // TOUCH TARGETS
 // ============================================================================
 
 export const touchTargets = {
-  min: '44px',    // Minimum touch target (Apple HIG)
+  min: '44px',
   preferred: '48px',
   large: '52px',
 } as const
@@ -402,33 +385,33 @@ export const touchTargets = {
 export const componentPresets = {
   button: {
     heights: {
-      sm: '2.75rem',  // 44px
-      md: '3rem',     // 48px
-      lg: '3.5rem',   // 56px
-      full: '3rem',   // 48px
+      sm: '2.5rem',
+      md: '2.75rem',
+      lg: '3rem',
+      full: '2.75rem',
     },
     paddingX: {
-      sm: '1rem',     // 16px
-      md: '1.5rem',   // 24px
-      lg: '2rem',     // 32px
+      sm: '0.875rem',
+      md: '1rem',
+      lg: '1.25rem',
     },
-    borderRadius: radius.xl,
+    borderRadius: radius.lg,
   },
 
   card: {
-    padding: spacing[4],      // 16px
-    borderRadius: radius.lg,  // 16px
+    padding: spacing[4],
+    borderRadius: radius.xl,
     gap: spacing[4],
   },
 
   input: {
     height: touchTargets.min,
-    paddingX: spacing[4],
-    borderRadius: radius.md,
+    paddingX: spacing[3],
+    borderRadius: radius.lg,
   },
 
   fab: {
-    size: '3.5rem', // 56px
+    size: '3.5rem',
     borderRadius: radius.full,
   },
 } as const
@@ -437,9 +420,6 @@ export const componentPresets = {
 // UTILITY FUNCTIONS
 // ============================================================================
 
-/**
- * Get CSS variable for a color token
- */
 export function getColorVar(path: string): string {
   const parts = path.split('.')
   if (parts[0] === 'brand' || parts[0] === 'semantic') {
@@ -451,13 +431,9 @@ export function getColorVar(path: string): string {
   return `var(--color-${path})`
 }
 
-/**
- * Generate inline styles from text style preset
- */
 export function getTextStyle(preset: keyof typeof textStyles): React.CSSProperties {
   return textStyles[preset] as React.CSSProperties
 }
 
-// Export type for design tokens
 export type ColorScale = typeof colors.brand.primary
 export type TypographyPreset = keyof typeof textStyles

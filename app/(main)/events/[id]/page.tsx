@@ -14,7 +14,6 @@ import {
   Check,
   X,
   Share2,
-  MoreVertical,
   QrCode,
 } from 'lucide-react'
 import Link from 'next/link'
@@ -39,7 +38,6 @@ import {
 import { MemberList, MemberWithBalance } from '@/components/event/MemberList'
 import { ExpenseForm } from '@/components/expense/ExpenseForm'
 import { Progress } from '@/components/ui/progress'
-import { Amount, AmountProgress } from '@/components/ui/amount'
 import { SkeletonBalanceCard, SkeletonExpenseList } from '@/components/ui/skeleton'
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -49,7 +47,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const [newMemberName, setNewMemberName] = useState('')
   const [copied, setCopied] = useState(false)
 
-  // Wait for params to resolve
   Promise.resolve(params).then((p) => setResolvedParams(p))
 
   const eventId = resolvedParams?.id || ''
@@ -99,7 +96,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     setTimeout(() => setCopied(false), 2000)
   }
 
-  // Calculate balances
   const memberBalances: MemberWithBalance[] = event?.members.map((member) => {
     const memberSplits = expenses
       ?.flatMap((e) => e.splits)
@@ -126,10 +122,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   if (eventLoading) {
     return (
       <Container>
-        <div className="py-4 safe-area-pt space-y-6">
-          {/* Header skeleton */}
+        <div className="py-6 safe-area-pt space-y-6">
           <div className="flex items-center gap-3">
-            <div className="h-11 w-11 rounded-full bg-[rgb(var(--color-border))] animate-pulse" />
+            <div className="h-11 w-11 rounded-lg bg-[rgb(var(--color-border))] animate-pulse" />
             <div className="flex-1 space-y-2">
               <div className="h-5 bg-[rgb(var(--color-border))] rounded w-32 animate-pulse" />
               <div className="h-4 bg-[rgb(var(--color-border))] rounded w-24 animate-pulse" />
@@ -145,7 +140,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   if (!event) {
     return (
       <Container>
-        <div className="py-4 safe-area-pt text-center">
+        <div className="py-6 safe-area-pt text-center">
           <p className="text-[rgb(var(--color-text-secondary))]">ไม่พบกิจกรรม</p>
         </div>
       </Container>
@@ -157,12 +152,12 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   return (
     <>
       <Container>
-        <div className="py-4 safe-area-pt space-y-5">
+        <div className="py-6 safe-area-pt space-y-6">
           {/* Header */}
           <div className="flex items-center gap-3">
             <Link
               href="/events"
-              className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+              className="h-11 w-11 rounded-lg bg-[var(--surface-background-alt)] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
             >
               <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
             </Link>
@@ -178,7 +173,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             </div>
             <button
               onClick={copyShareLink}
-              className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+              className="h-11 w-11 rounded-lg bg-[var(--surface-background-alt)] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
             >
               {copied ? (
                 <Check className="h-5 w-5 text-[var(--color-semantic-success-500)]" />
@@ -188,35 +183,44 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             </button>
           </div>
 
-          {/* Hero Card - Total and Progress */}
-          <div className="card-elevated overflow-hidden">
-            {/* Gradient header */}
-            <div className="gradient-thai p-5 text-white">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-white/80 text-sm">ยอดรวมทั้งหมด</p>
-                <Link
-                  href={`/events/${event.id}/pay`}
-                  className="h-10 px-4 rounded-full bg-white text-[var(--color-brand-primary-600)] text-sm font-semibold flex items-center gap-1.5 touch-feedback active:scale-95 transition-transform"
-                >
-                  <span>จ่าย</span>
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
+          {/* Balance Card */}
+          <div className="card-elevated">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-1">
+                  ยอดรวมทั้งหมด
+                </p>
+                <h2 className="text-3xl font-bold text-[rgb(var(--color-text))] tracking-tight">
+                  {formatThaiCurrency(totalAmount)}
+                </h2>
               </div>
-              <h2 className="text-3xl font-bold tracking-tight">
-                {formatThaiCurrency(totalAmount)}
-              </h2>
+              <Link
+                href={`/events/${event.id}/pay`}
+                className="h-10 px-4 rounded-lg bg-[var(--color-brand-primary-500)] text-white text-sm font-semibold flex items-center gap-1.5 touch-feedback active:scale-95 transition-transform"
+              >
+                <span>จ่าย</span>
+                <ChevronRight className="h-4 w-4" />
+              </Link>
             </div>
 
             {/* Progress */}
-            <div className="p-4">
-              <AmountProgress paid={totalPaid} total={totalAmount} />
+            <div className="pt-4 border-t border-[rgb(var(--color-border-light))]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-[rgb(var(--color-text-secondary))]">
+                  ชำระแล้ว {progressPercentage}%
+                </span>
+                <span className="text-xs font-medium text-[rgb(var(--color-text))]">
+                  ฿{totalPaid.toLocaleString()} / ฿{totalAmount.toLocaleString()}
+                </span>
+              </div>
+              <Progress value={progressPercentage} size="sm" />
             </div>
           </div>
 
-          {/* Quick Stats Row */}
+          {/* Quick Stats */}
           <div className="flex gap-3 overflow-x-auto snap-x-mobile pb-2 scrollbar-hide">
             <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
-              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-primary-500)]/10 flex items-center justify-center mx-auto mb-2">
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-primary-100)] flex items-center justify-center mx-auto mb-2">
                 <Users className="h-5 w-5 text-[var(--color-brand-primary-500)]" />
               </div>
               <div className="text-xl font-bold text-[rgb(var(--color-text))]">
@@ -227,8 +231,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
             <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
-              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-accent-500)]/10 flex items-center justify-center mx-auto mb-2">
-                <Banknote className="h-5 w-5 text-[var(--color-brand-accent-500)]" />
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-accent-100)] flex items-center justify-center mx-auto mb-2">
+                <Banknote className="h-5 w-5 text-[var(--color-brand-accent-600)]" />
               </div>
               <div className="text-xl font-bold text-[rgb(var(--color-text))]">
                 {expenses?.length || 0}
@@ -238,8 +242,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               </div>
             </div>
             <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
-              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-secondary-500)]/10 flex items-center justify-center mx-auto mb-2">
-                <QrCode className="h-5 w-5 text-[var(--color-brand-secondary-500)]" />
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-secondary-100)] flex items-center justify-center mx-auto mb-2">
+                <QrCode className="h-5 w-5 text-[var(--color-brand-secondary-600)]" />
               </div>
               <div className="text-lg font-bold text-[rgb(var(--color-text))] font-mono">
                 {event.share_code}
@@ -252,22 +256,22 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
           {/* Tabs */}
           <Tabs defaultValue="expenses" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3 bg-[rgb(var(--color-bg-alt))] p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-3 bg-[var(--surface-background-alt)] p-1 rounded-lg">
               <TabsTrigger
                 value="expenses"
-                className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+                className="rounded-md data-[state=active]:bg-[var(--surface-card)] data-[state=active]:text-[rgb(var(--color-text))] data-[state=active]:shadow-sm text-sm"
               >
                 รายจ่าย
               </TabsTrigger>
               <TabsTrigger
                 value="members"
-                className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+                className="rounded-md data-[state=active]:bg-[var(--surface-card)] data-[state=active]:text-[rgb(var(--color-text))] data-[state=active]:shadow-sm text-sm"
               >
                 สมาชิก
               </TabsTrigger>
               <TabsTrigger
                 value="balances"
-                className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+                className="rounded-md data-[state=active]:bg-[var(--surface-card)] data-[state=active]:text-[rgb(var(--color-text))] data-[state=active]:shadow-sm text-sm"
               >
                 ยอดคงเหลือ
               </TabsTrigger>
@@ -276,7 +280,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             {/* Expenses Tab */}
             <TabsContent value="expenses" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+                <h2 className="text-base font-semibold text-[rgb(var(--color-text))]">
                   รายจ่าย ({expenses?.length || 0})
                 </h2>
                 <Button size="sm" onClick={() => setShowAddExpense(true)}>
@@ -289,8 +293,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 <SkeletonExpenseList count={3} />
               ) : !expenses || expenses.length === 0 ? (
                 <div className="card-mobile p-8 text-center">
-                  <div className="h-16 w-16 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-4">
-                    <Banknote className="h-7 w-7 text-[rgb(var(--color-text-tertiary))]" />
+                  <div className="h-14 w-14 rounded-xl bg-[var(--surface-background-alt)] flex items-center justify-center mx-auto mb-4">
+                    <Banknote className="h-6 w-6 text-[rgb(var(--color-text-tertiary))]" />
                   </div>
                   <h3 className="font-semibold text-[rgb(var(--color-text))] mb-2">
                     ยังไม่มีรายจ่าย
@@ -313,8 +317,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <div className="h-11 w-11 rounded-xl bg-[var(--color-brand-accent-500)]/10 flex items-center justify-center">
-                            <Banknote className="h-5 w-5 text-[var(--color-brand-accent-500)]" />
+                          <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-accent-100)] flex items-center justify-center">
+                            <Banknote className="h-5 w-5 text-[var(--color-brand-accent-600)]" />
                           </div>
                           <div>
                             <div className="font-medium text-[rgb(var(--color-text))]">
@@ -326,7 +330,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                           </div>
                         </div>
                         <div className="text-right">
-                          <Amount value={expense.amount} size="lg" />
+                          <div className="font-bold text-[rgb(var(--color-text))]">
+                            ฿{expense.amount.toLocaleString()}
+                          </div>
                           <div className="text-xs text-[rgb(var(--color-text-tertiary))]">
                             {formatRelativeTime(expense.expense_date)}
                           </div>
@@ -341,7 +347,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             {/* Members Tab */}
             <TabsContent value="members" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+                <h2 className="text-base font-semibold text-[rgb(var(--color-text))]">
                   สมาชิก ({event.members.length})
                 </h2>
                 <Sheet open={showAddMember} onOpenChange={setShowAddMember}>
@@ -355,7 +361,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     <SheetHeader className="flex flex-row items-center justify-between">
                       <SheetTitle>เพิ่มสมาชิก</SheetTitle>
                       <SheetClose asChild>
-                        <button className="h-8 w-8 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center">
+                        <button className="h-8 w-8 rounded-lg bg-[var(--surface-background-alt)] flex items-center justify-center">
                           <X className="h-4 w-4" />
                         </button>
                       </SheetClose>
@@ -369,7 +375,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                           value={newMemberName}
                           onChange={(e) => setNewMemberName(e.target.value)}
                           autoFocus
-                          className="h-12"
+                          className="h-11"
                         />
                       </div>
                       <Button
@@ -390,7 +396,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             {/* Balances Tab */}
             <TabsContent value="balances" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+                <h2 className="text-base font-semibold text-[rgb(var(--color-text))]">
                   ใครค้างเท่าไหร่
                 </h2>
               </div>
@@ -403,7 +409,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           <div className="flex items-center gap-3 pb-safe">
             <button
               onClick={copyShareLink}
-              className="flex-1 h-12 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text))] font-medium flex items-center justify-center gap-2 touch-feedback active:scale-[0.98] transition-all border border-[rgb(var(--color-border-light))]"
+              className="flex-1 h-11 rounded-lg bg-[var(--surface-background-alt)] text-[rgb(var(--color-text))] font-medium flex items-center justify-center gap-2 touch-feedback active:scale-98 transition-all border border-[rgb(var(--color-border-light))]"
             >
               {copied ? (
                 <>
@@ -418,7 +424,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               )}
             </button>
             <Button
-              className="flex-1 h-12"
+              className="flex-1 h-11"
               onClick={() => setShowAddExpense(true)}
             >
               <Plus className="h-5 w-5 mr-2" />
@@ -428,7 +434,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </Container>
 
-      {/* Expense Form Sheet */}
       <ExpenseForm
         open={showAddExpense}
         onOpenChange={setShowAddExpense}

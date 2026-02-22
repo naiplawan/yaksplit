@@ -14,7 +14,6 @@ export default function EventsPage() {
   const { data: events, isLoading, error } = useEvents()
   const [filter, setFilter] = useState<'active' | 'completed' | 'all'>('active')
 
-  // Check URL params for initial filter
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const urlFilter = params.get('filter')
@@ -36,7 +35,7 @@ export default function EventsPage() {
 
   return (
     <Container>
-      <div className="py-4 safe-area-pt space-y-5">
+      <div className="py-6 safe-area-pt space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -58,11 +57,11 @@ export default function EventsPage() {
             <input
               type="text"
               placeholder="ค้นหากิจกรรม..."
-              className="input-mobile pl-12 h-12"
+              className="input-mobile pl-12 h-11"
             />
           </div>
           <Link href="/events/new">
-            <Button size="icon" className="h-12 w-12 rounded-xl">
+            <Button size="icon" className="h-11 w-11 rounded-lg">
               <Plus className="h-5 w-5" />
             </Button>
           </Link>
@@ -133,7 +132,7 @@ export default function EventsPage() {
 
         {/* Summary Stats */}
         {!isLoading && events && events.length > 0 && (
-          <div className="mt-6 p-4 rounded-2xl bg-[rgb(var(--color-bg-alt))] border border-[rgb(var(--color-border-light))]">
+          <div className="mt-4 p-4 rounded-xl bg-[var(--surface-background-alt)] border border-[rgb(var(--color-border-light))]">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-2xl font-bold text-[rgb(var(--color-text))]">
