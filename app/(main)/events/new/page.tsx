@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Container } from '@/components/layout/Container'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Plus, X, Users } from 'lucide-react'
+import { ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface MemberInput {
@@ -25,7 +25,7 @@ export default function NewEventPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [members, setMembers] = useState<MemberInput[]>([
-    { id: '1', nickname: 'Me' },
+    { id: '1', nickname: 'ฉัน' },
   ])
 
   const addMember = () => {
@@ -79,16 +79,16 @@ export default function NewEventPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/events"
-            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+            className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
           >
             <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
           </Link>
           <div>
             <h1 className="text-lg font-bold text-[rgb(var(--color-text))]">
-              Create New Event
+              สร้างกิจกรรมใหม่
             </h1>
             <p className="text-sm text-[rgb(var(--color-text-secondary))]">
-              Set up a new bill split
+              ตั้งค่าการแบ่งค่าใช้จ่าย
             </p>
           </div>
         </div>
@@ -104,17 +104,17 @@ export default function NewEventPage() {
                 </span>
               </div>
               <h2 className="font-semibold text-[rgb(var(--color-text))]">
-                Event Details
+                รายละเอียดกิจกรรม
               </h2>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="title" className="text-sm text-[rgb(var(--color-text))]">
-                Event Title <span className="text-[rgb(var(--color-error))]">*</span>
+                ชื่อกิจกรรม <span className="text-[rgb(var(--color-error))]">*</span>
               </Label>
               <Input
                 id="title"
-                placeholder="e.g., Friday Dinner, Chiang Mai Trip"
+                placeholder="เช่น ทานเย็นวันศุกร์, เที่ยวเชียงใหม่"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -125,11 +125,11 @@ export default function NewEventPage() {
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm text-[rgb(var(--color-text))]">
-                Description <span className="text-[rgb(var(--color-text-tertiary))]">(optional)</span>
+                รายละเอียด <span className="text-[rgb(var(--color-text-tertiary))]">(ไม่บังคับ)</span>
               </Label>
               <Textarea
                 id="description"
-                placeholder="Add some details about this event..."
+                placeholder="เพิ่มรายละเอียดเกี่ยวกับกิจกรรม..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
@@ -148,16 +148,16 @@ export default function NewEventPage() {
                   </span>
                 </div>
                 <h2 className="font-semibold text-[rgb(var(--color-text))]">
-                  Members ({members.length})
+                  สมาชิก ({members.length})
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={addMember}
-                className="h-10 px-4 rounded-xl bg-[rgb(var(--color-primary))] text-white text-sm font-medium touch-feedback active:scale-95 transition-all flex items-center gap-1.5"
+                className="h-11 px-4 rounded-xl bg-[rgb(var(--color-primary))] text-white text-sm font-medium touch-feedback active:scale-95 transition-all flex items-center gap-1.5"
               >
                 <Plus className="h-4 w-4" />
-                Add
+                เพิ่ม
               </button>
             </div>
 
@@ -174,7 +174,7 @@ export default function NewEventPage() {
                       </span>
                     </div>
                     <Input
-                      placeholder="Name"
+                      placeholder="ชื่อ"
                       value={member.nickname}
                       onChange={(e) => updateMember(member.id, 'nickname', e.target.value)}
                       className="flex-1 h-11"
@@ -192,13 +192,13 @@ export default function NewEventPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <Input
-                      placeholder="Phone (optional)"
+                      placeholder="เบอร์โทร (ไม่บังคับ)"
                       value={member.phone || ''}
                       onChange={(e) => updateMember(member.id, 'phone', e.target.value)}
                       className="h-11"
                     />
                     <Input
-                      placeholder="PromptPay ID (optional)"
+                      placeholder="พร้อมเพย์ (ไม่บังคับ)"
                       value={member.promptpay_id || ''}
                       onChange={(e) => updateMember(member.id, 'promptpay_id', e.target.value)}
                       className="h-11"
@@ -216,16 +216,17 @@ export default function NewEventPage() {
                 type="button"
                 className="w-full h-12 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text))] font-medium touch-feedback active:scale-[0.98] transition-all border border-[rgb(var(--color-border-light))]"
               >
-                Cancel
+                ยกเลิก
               </button>
             </Link>
-            <button
+            <Button
               type="submit"
-              className="flex-1 btn-primary h-12 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+              size="lg"
+              className="flex-1"
               disabled={createEvent.isPending || !title.trim()}
             >
-              {createEvent.isPending ? 'Creating...' : 'Create Event'}
-            </button>
+              {createEvent.isPending ? 'กำลังสร้าง...' : 'สร้างกิจกรรม'}
+            </Button>
           </div>
         </form>
       </div>

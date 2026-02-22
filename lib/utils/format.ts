@@ -11,6 +11,19 @@ export function formatThaiCurrency(amount: number): string {
 }
 
 /**
+ * Format currency with specified currency code
+ */
+export function formatCurrency(amount: number, currency: string = 'THB'): string {
+  const locale = currency === 'THB' ? 'th-TH' : 'en-US'
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: currency === 'THB' ? 0 : 2,
+  }).format(amount)
+}
+
+/**
  * Format amount without currency symbol
  */
 export function formatAmount(amount: number): string {

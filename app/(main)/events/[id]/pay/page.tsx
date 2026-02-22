@@ -6,7 +6,7 @@ import { useExpenses } from '@/lib/hooks/useExpenses'
 import { useSplitQR, useMarkAsPaid } from '@/lib/hooks/useSplits'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/layout/Container'
-import { ArrowLeft, CheckCircle, Copy, QrCode, Download, Share2 } from 'lucide-react'
+import { ArrowLeft, CheckCircle, QrCode, Download, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { formatThaiCurrency } from '@/lib/utils/format'
 import Image from 'next/image'
@@ -94,7 +94,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
     return (
       <Container>
         <div className="py-4 safe-area-pt text-center">
-          <p className="text-[rgb(var(--color-text-secondary))]">Event not found</p>
+          <p className="text-[rgb(var(--color-text-secondary))]">ไม่พบกิจกรรม</p>
         </div>
       </Container>
     )
@@ -109,13 +109,13 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
         <div className="flex items-center gap-3">
           <Link
             href={`/events/${eventId}`}
-            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+            className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
           >
             <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
           </Link>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-[rgb(var(--color-text))]">
-              Pay Your Share
+              จ่ายส่วนของคุณ
             </h1>
             <p className="text-sm text-[rgb(var(--color-text-secondary))]">
               {event.title}
@@ -123,7 +123,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
           </div>
           <button
             onClick={copyShareLink}
-            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+            className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
           >
             <Share2 className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
           </button>
@@ -133,13 +133,13 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
         <div className="card-mobile p-5 bg-gradient-to-br from-[rgb(var(--color-primary))]/20 to-[rgb(var(--color-accent))]/20 border-[rgb(var(--color-primary))]/30">
           <div className="text-center">
             <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-1">
-              Total Amount Due
+              ยอดรวมที่ต้องจ่าย
             </p>
             <p className="text-4xl font-bold text-[rgb(var(--color-primary))] mb-1">
               {formatThaiCurrency(totalOwed)}
             </p>
             <p className="text-sm text-[rgb(var(--color-text-secondary))]">
-              {pendingSplits.length} expense{pendingSplits.length !== 1 ? 's' : ''} to pay
+              {pendingSplits.length} รายการที่ต้องจ่าย
             </p>
           </div>
         </div>
@@ -151,15 +151,15 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
               <CheckCircle className="h-10 w-10 text-[rgb(var(--color-success))]" />
             </div>
             <h3 className="text-xl font-bold text-[rgb(var(--color-text))] mb-2">
-              All Caught Up!
+              จ่ายครบแล้ว!
             </h3>
             <p className="text-[rgb(var(--color-text-secondary))] mb-6">
-              You have paid all your shares for this event.
+              คุณได้จ่ายครบทุกรายการสำหรับกิจกรรมนี้แล้ว
             </p>
             <Link href={`/events/${eventId}`}>
-              <button className="btn-primary w-full">
-                Back to Event
-              </button>
+              <Button className="w-full">
+                กลับไปที่กิจกรรม
+              </Button>
             </Link>
           </div>
         ) : (
@@ -168,7 +168,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
             {pendingSplits.length > 1 && (
               <div className="space-y-3">
                 <h2 className="text-sm font-semibold text-[rgb(var(--color-text-secondary))] px-1">
-                  Select Expense to Pay
+                  เลือกรายการที่จะจ่าย
                 </h2>
                 <div className="flex gap-3 overflow-x-auto snap-x-mobile pb-2 scrollbar-hide">
                   {pendingSplits.map((split) => {
@@ -193,7 +193,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                           {formatThaiCurrency(owed)}
                         </div>
                         <div className="text-xs text-[rgb(var(--color-text-secondary))] mt-1">
-                          Pay to {split.payer?.nickname || 'Unknown'}
+                          จ่ายให้ {split.payer?.nickname || 'ไม่ทราบ'}
                         </div>
                       </button>
                     )
@@ -209,7 +209,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="font-semibold text-[rgb(var(--color-text))]">
-                      PromptPay QR Code
+                      QR Code พร้อมเพย์
                     </h2>
                     {qrData?.qr_code && (
                       <button
@@ -217,7 +217,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                         className="h-9 px-3 rounded-lg bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text-secondary))] text-sm font-medium touch-feedback active:scale-95 transition-all flex items-center gap-1.5"
                       >
                         <Download className="h-4 w-4" />
-                        Save
+                        บันทึก
                       </button>
                     )}
                   </div>
@@ -233,7 +233,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                         <div className="bg-white p-4 rounded-2xl shadow-xl">
                           <Image
                             src={qrData.qr_code}
-                            alt="PromptPay QR Code"
+                            alt="QR Code พร้อมเพย์"
                             width={256}
                             height={256}
                             className="w-56 h-56"
@@ -247,7 +247,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                           {formatThaiCurrency(amountOwed)}
                         </p>
                         <p className="text-sm text-[rgb(var(--color-text-secondary))] mt-1">
-                          Pay to{' '}
+                          จ่ายให้{' '}
                           <span className="font-medium text-[rgb(var(--color-text))]">
                             {qrData.payer_name}
                           </span>
@@ -264,7 +264,7 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-[rgb(var(--color-text))] text-sm">
-                            How to pay with PromptPay
+                            วิธีจ่ายด้วยพร้อมเพย์
                           </span>
                           <QrCode className="h-5 w-5 text-[rgb(var(--color-primary))]" />
                         </div>
@@ -277,53 +277,53 @@ export default function PaymentPage({ params }: { params: Promise<{ id: string }
                               <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
                                 1
                               </span>
-                              <span>Open your banking app (K Plus, SCB Easy, etc.)</span>
+                              <span>เปิดแอปธนาคาร (K Plus, SCB Easy ฯลฯ)</span>
                             </li>
                             <li className="flex items-start gap-3">
                               <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
                                 2
                               </span>
-                              <span>Select "Scan QR" or "PromptPay" feature</span>
+                              <span>เลือก "สแกน QR" หรือ "พร้อมเพย์"</span>
                             </li>
                             <li className="flex items-start gap-3">
                               <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
                                 3
                               </span>
-                              <span>Scan the QR code above</span>
+                              <span>สแกน QR Code ด้านบน</span>
                             </li>
                             <li className="flex items-start gap-3">
                               <span className="flex-shrink-0 h-6 w-6 rounded-full bg-[rgb(var(--color-primary))] text-white flex items-center justify-center text-xs font-bold">
                                 4
                               </span>
-                              <span>Confirm the payment amount and transfer</span>
+                              <span>ยืนยันยอดเงินและโอน</span>
                             </li>
                           </ol>
                         </div>
                       )}
 
                       {/* Mark as Paid Button */}
-                      <button
-                        className="btn-primary w-full py-4 text-base font-semibold flex items-center justify-center gap-2"
+                      <Button
+                        className="w-full py-4 text-base font-semibold"
                         onClick={handleMarkAsPaid}
                         disabled={markAsPaid.isPending}
                       >
                         {markAsPaid.isPending ? (
-                          'Marking...'
+                          'กำลังบันทึก...'
                         ) : (
                           <>
-                            <CheckCircle className="h-5 w-5" />
-                            Mark as Paid
+                            <CheckCircle className="h-5 w-5 mr-2" />
+                            บันทึกว่าจ่ายแล้ว
                           </>
                         )}
-                      </button>
+                      </Button>
                     </div>
                   ) : (
                     <div className="text-center py-12">
                       <div className="h-16 w-16 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-4">
-                        <QrCode className="h-8 w-8 text-[rgb(var(--color-text-tertiary)]" />
+                        <QrCode className="h-8 w-8 text-[rgb(var(--color-text-tertiary))]" />
                       </div>
                       <p className="text-[rgb(var(--color-text-secondary))]">
-                        No PromptPay ID set for the payer
+                        ผู้รับเงินยังไม่ได้ตั้งค่าพร้อมเพย์
                       </p>
                     </div>
                   )}

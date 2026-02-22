@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryClientProvider } from "@/app/providers/query-provider";
+import { ThemeProvider } from "@/app/providers/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { ViewportHeight } from "@/components/layout/ViewportHeight";
@@ -38,15 +39,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ViewportHeight />
-        <QueryClientProvider>
-          <div className="flex min-h-screen flex-col bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))]">
-            <Header />
-            <main className="flex-1 pb-safe safe-area-p">
-              {children}
-            </main>
-            <BottomNav />
-          </div>
-        </QueryClientProvider>
+        <ThemeProvider>
+          <QueryClientProvider>
+            <div className="flex min-h-screen flex-col bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))]">
+              <Header />
+              <main className="flex-1 pb-safe safe-area-p">
+                {children}
+              </main>
+              <BottomNav />
+            </div>
+          </QueryClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEvent, useAddMember } from '@/lib/hooks/useEvents'
-import { useExpenses as useAllExpenses } from '@/lib/hooks/useExpenses'
+import { useExpenses as useAllExpenses, useCreateExpense } from '@/lib/hooks/useExpenses'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/layout/Container'
 import {
@@ -9,37 +9,45 @@ import {
   Plus,
   Users,
   Banknote,
-  Share2,
-  Settings,
   ChevronRight,
   Copy,
   Check,
-  Crown,
+  X,
+  Share2,
+  MoreVertical,
+  QrCode,
 } from 'lucide-react'
 import Link from 'next/link'
-import { formatThaiCurrency, formatThaiPhone } from '@/lib/utils/format'
+import { formatThaiCurrency, formatRelativeTime } from '@/lib/utils/format'
 import { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from '@/components/ui/sheet'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
+import { MemberList, MemberWithBalance } from '@/components/event/MemberList'
+import { ExpenseForm } from '@/components/expense/ExpenseForm'
+import { Progress } from '@/components/ui/progress'
+import { Amount, AmountProgress } from '@/components/ui/amount'
+import { SkeletonBalanceCard, SkeletonExpenseList } from '@/components/ui/skeleton'
 
 export default function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null)
   const [showAddMember, setShowAddMember] = useState(false)
+  const [showAddExpense, setShowAddExpense] = useState(false)
   const [newMemberName, setNewMemberName] = useState('')
+  const [copied, setCopied] = useState(false)
 
   // Wait for params to resolve
   Promise.resolve(params).then((p) => setResolvedParams(p))
@@ -48,6 +56,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   const { data: event, isLoading: eventLoading } = useEvent(eventId)
   const { data: expenses, isLoading: expensesLoading } = useAllExpenses(eventId)
   const addMember = useAddMember()
+  const createExpense = useCreateExpense()
 
   if (!resolvedParams) {
     return null
@@ -70,13 +79,28 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     }
   }
 
+  const handleCreateExpense = async (data: {
+    title: string
+    amount: number
+    payer_member_id: string
+    split_type: 'equal' | 'custom' | 'percentage'
+    notes?: string
+  }) => {
+    await createExpense.mutateAsync({
+      event_id: eventId,
+      ...data,
+    })
+  }
+
   const copyShareLink = () => {
     const url = `${window.location.origin}/share/${event?.share_code}`
     navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   // Calculate balances
-  const memberBalances = event?.members.map((member) => {
+  const memberBalances: MemberWithBalance[] = event?.members.map((member) => {
     const memberSplits = expenses
       ?.flatMap((e) => e.splits)
       .filter((s) => s?.member_id === member.id) || []
@@ -94,16 +118,25 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
   }) || []
 
   const totalAmount = expenses?.reduce((sum, e) => sum + e.amount, 0) || 0
-  const totalOwedAll = memberBalances.reduce((sum, m) => sum + m.balance, 0)
+  const totalPaid = expenses?.reduce((sum, e) => {
+    const paidForExpense = e.splits?.reduce((s, split) => s + (split?.amount_paid || 0), 0) || 0
+    return sum + paidForExpense
+  }, 0) || 0
 
   if (eventLoading) {
     return (
       <Container>
-        <div className="py-4 safe-area-pt">
-          <div className="animate-pulse space-y-4">
-            <div className="h-6 w-32 bg-[rgb(var(--color-border))] rounded" />
-            <div className="h-32 bg-[rgb(var(--color-border))] rounded-2xl" />
+        <div className="py-4 safe-area-pt space-y-6">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3">
+            <div className="h-11 w-11 rounded-full bg-[rgb(var(--color-border))] animate-pulse" />
+            <div className="flex-1 space-y-2">
+              <div className="h-5 bg-[rgb(var(--color-border))] rounded w-32 animate-pulse" />
+              <div className="h-4 bg-[rgb(var(--color-border))] rounded w-24 animate-pulse" />
+            </div>
           </div>
+          <SkeletonBalanceCard />
+          <SkeletonExpenseList count={3} />
         </div>
       </Container>
     )
@@ -113,337 +146,296 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     return (
       <Container>
         <div className="py-4 safe-area-pt text-center">
-          <p className="text-[rgb(var(--color-text-secondary))]">Event not found</p>
+          <p className="text-[rgb(var(--color-text-secondary))]">ไม่พบกิจกรรม</p>
         </div>
       </Container>
     )
   }
 
+  const progressPercentage = totalAmount > 0 ? Math.round((totalPaid / totalAmount) * 100) : 0
+
   return (
-    <Container>
-      <div className="py-4 safe-area-pt space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/events"
-            className="h-10 w-10 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
-          >
-            <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-[rgb(var(--color-text))] truncate">
-              {event.title}
-            </h1>
-            {event.description && (
-              <p className="text-sm text-[rgb(var(--color-text-secondary))] truncate">
-                {event.description}
-              </p>
-            )}
-          </div>
-          <Link
-            href={`/events/${event.id}/pay`}
-            className="h-10 px-4 rounded-full bg-[rgb(var(--color-primary))] text-white text-sm font-medium flex items-center gap-1.5 touch-feedback active:scale-95 transition-transform shadow-lg shadow-[rgb(var(--color-primary))]/30"
-          >
-            <span>Pay</span>
-            <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        {/* Stats Cards - Horizontal Scroll */}
-        <div className="flex gap-3 overflow-x-auto snap-x-mobile pb-2 scrollbar-hide">
-          <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
-            <Banknote className="h-5 w-5 text-[rgb(var(--color-primary))] mx-auto mb-1.5" />
-            <div className="text-xl font-bold text-[rgb(var(--color-text))]">
-              {formatThaiCurrency(totalAmount)}
-            </div>
-            <div className="text-xs text-[rgb(var(--color-text-secondary))]">
-              Total
-            </div>
-          </div>
-          <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
-            <Users className="h-5 w-5 text-[rgb(var(--color-accent))] mx-auto mb-1.5" />
-            <div className="text-xl font-bold text-[rgb(var(--color-text))]">
-              {event.members.length}
-            </div>
-            <div className="text-xs text-[rgb(var(--color-text-secondary))]">
-              Members
-            </div>
-          </div>
-          <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
-            <div className="h-5 w-5 text-[rgb(var(--color-secondary))] mx-auto mb-1.5 flex items-center justify-center font-mono font-bold text-sm">
-              {event.share_code}
-            </div>
-            <div className="text-xl font-bold text-[rgb(var(--color-text))] mt-1.5">
-              {expenses?.length || 0}
-            </div>
-            <div className="text-xs text-[rgb(var(--color-text-secondary))]">
-              Expenses
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="members" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 bg-[rgb(var(--color-bg-alt))] p-1 rounded-xl">
-            <TabsTrigger
-              value="members"
-              className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+    <>
+      <Container>
+        <div className="py-4 safe-area-pt space-y-5">
+          {/* Header */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/events"
+              className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
             >
-              Members
-            </TabsTrigger>
-            <TabsTrigger
-              value="expenses"
-              className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
-            >
-              Expenses
-            </TabsTrigger>
-            <TabsTrigger
-              value="balances"
-              className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
-            >
-              Balances
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Members Tab */}
-          <TabsContent value="members" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
-                Members ({event.members.length})
-              </h2>
-              <Sheet open={showAddMember} onOpenChange={setShowAddMember}>
-                <SheetTrigger asChild>
-                  <button className="h-10 px-4 rounded-xl bg-[rgb(var(--color-primary))] text-white text-sm font-medium touch-feedback active:scale-95 transition-all">
-                    <Plus className="h-4 w-4 inline mr-1" />
-                    Add
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="bottom" className="rounded-t-2xl">
-                  <SheetHeader>
-                    <SheetTitle>Add Member</SheetTitle>
-                  </SheetHeader>
-                  <div className="space-y-4 mt-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="member-name">Name</Label>
-                      <Input
-                        id="member-name"
-                        placeholder="Enter name"
-                        value={newMemberName}
-                        onChange={(e) => setNewMemberName(e.target.value)}
-                        autoFocus
-                      />
-                    </div>
-                    <button
-                      className="btn-primary w-full py-3"
-                      onClick={handleAddMember}
-                      disabled={!newMemberName.trim() || addMember.isPending}
-                    >
-                      {addMember.isPending ? 'Adding...' : 'Add Member'}
-                    </button>
-                  </div>
-                </SheetContent>
-              </Sheet>
-            </div>
-
-            <div className="space-y-3">
-              {event.members.map((member) => (
-                <div
-                  key={member.id}
-                  className="card-mobile p-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-11 w-11">
-                      <AvatarFallback className="bg-[rgb(var(--color-primary))]/10 text-[rgb(var(--color-primary))] text-sm font-medium">
-                        {member.nickname.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-[rgb(var(--color-text))] flex items-center gap-2">
-                        {member.nickname}
-                        {member.role === 'creator' && (
-                          <Crown className="h-3.5 w-3.5 text-[rgb(var(--color-secondary))]" />
-                        )}
-                      </div>
-                      {member.promptpay_id && (
-                        <div className="text-xs text-[rgb(var(--color-text-secondary))]">
-                          {formatThaiPhone(member.promptpay_id)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </TabsContent>
-
-          {/* Expenses Tab */}
-          <TabsContent value="expenses" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
-                Expenses ({expenses?.length || 0})
-              </h2>
-              <Link href={`/events/${event.id}/expenses/new`}>
-                <button className="h-10 px-4 rounded-xl bg-[rgb(var(--color-primary))] text-white text-sm font-medium touch-feedback active:scale-95 transition-all">
-                  <Plus className="h-4 w-4 inline mr-1" />
-                  Add
-                </button>
-              </Link>
-            </div>
-
-            {expensesLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-pulse h-8 w-8 rounded-full bg-[rgb(var(--color-border))]"></div>
-              </div>
-            ) : !expenses || expenses.length === 0 ? (
-              <div className="card-mobile p-8 text-center">
-                <div className="h-16 w-16 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-4">
-                  <Banknote className="h-7 w-7 text-[rgb(var(--color-text-tertiary)]" />
-                </div>
-                <h3 className="font-semibold text-[rgb(var(--color-text))] mb-2">
-                  No expenses yet
-                </h3>
-                <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-4">
-                  Add your first expense to start tracking
+              <ArrowLeft className="h-5 w-5 text-[rgb(var(--color-text))]" />
+            </Link>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-bold text-[rgb(var(--color-text))] truncate">
+                {event.title}
+              </h1>
+              {event.description && (
+                <p className="text-sm text-[rgb(var(--color-text-secondary))] truncate">
+                  {event.description}
                 </p>
-                <Link href={`/events/${event.id}/expenses/new`}>
-                  <button className="btn-primary w-full">
-                    <Plus className="h-4 w-4 inline mr-2" />
-                    Add Expense
-                  </button>
+              )}
+            </div>
+            <button
+              onClick={copyShareLink}
+              className="h-11 w-11 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center border border-[rgb(var(--color-border-light))] touch-feedback active:scale-95 transition-transform"
+            >
+              {copied ? (
+                <Check className="h-5 w-5 text-[var(--color-semantic-success-500)]" />
+              ) : (
+                <Share2 className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
+              )}
+            </button>
+          </div>
+
+          {/* Hero Card - Total and Progress */}
+          <div className="card-elevated overflow-hidden">
+            {/* Gradient header */}
+            <div className="gradient-thai p-5 text-white">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-white/80 text-sm">ยอดรวมทั้งหมด</p>
+                <Link
+                  href={`/events/${event.id}/pay`}
+                  className="h-10 px-4 rounded-full bg-white text-[var(--color-brand-primary-600)] text-sm font-semibold flex items-center gap-1.5 touch-feedback active:scale-95 transition-transform"
+                >
+                  <span>จ่าย</span>
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {expenses.map((expense) => (
-                  <Link
-                    key={expense.id}
-                    href="#"
-                    className="block card-mobile p-4 touch-feedback active:scale-[0.99] transition-all"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-11 w-11 rounded-full bg-[rgb(var(--color-accent))]/10 flex items-center justify-center">
-                          <Banknote className="h-5 w-5 text-[rgb(var(--color-accent))]" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-[rgb(var(--color-text))]">
-                            {expense.title}
-                          </div>
-                          <div className="text-sm text-[rgb(var(--color-text-secondary))]">
-                            {expense.payer?.nickname || 'Unknown'} paid
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-[rgb(var(--color-text))]">
-                          {formatThaiCurrency(expense.amount)}
-                        </div>
-                        <div className="text-xs text-[rgb(var(--color-text-tertiary))]">
-                          {new Date(expense.expense_date).toLocaleDateString('th-TH', {
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* Balances Tab */}
-          <TabsContent value="balances" className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
-                Who Owes What
+              <h2 className="text-3xl font-bold tracking-tight">
+                {formatThaiCurrency(totalAmount)}
               </h2>
             </div>
 
-            <div className="space-y-3">
-              {memberBalances.map((member) => {
-                const isPaid = member.balance <= 0
-                const isPartial = member.balance > 0 && member.totalPaid > 0
+            {/* Progress */}
+            <div className="p-4">
+              <AmountProgress paid={totalPaid} total={totalAmount} />
+            </div>
+          </div>
 
-                return (
-                  <div
-                    key={member.id}
-                    className="card-mobile p-4 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-11 w-11">
-                        <AvatarFallback
-                          className={`${
-                            isPaid
-                              ? 'bg-[rgb(var(--color-success))]/10 text-[rgb(var(--color-success))]'
-                              : 'bg-[rgb(var(--color-accent))]/10 text-[rgb(var(--color-accent))]'
-                          } text-sm font-medium`}
-                        >
-                          {member.nickname.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium text-[rgb(var(--color-text))] flex items-center gap-2">
-                          {member.nickname}
-                          {member.role === 'creator' && (
-                            <Crown className="h-3.5 w-3.5 text-[rgb(var(--color-secondary))]" />
-                          )}
+          {/* Quick Stats Row */}
+          <div className="flex gap-3 overflow-x-auto snap-x-mobile pb-2 scrollbar-hide">
+            <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-primary-500)]/10 flex items-center justify-center mx-auto mb-2">
+                <Users className="h-5 w-5 text-[var(--color-brand-primary-500)]" />
+              </div>
+              <div className="text-xl font-bold text-[rgb(var(--color-text))]">
+                {event.members.length}
+              </div>
+              <div className="text-xs text-[rgb(var(--color-text-secondary))]">
+                สมาชิก
+              </div>
+            </div>
+            <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-accent-500)]/10 flex items-center justify-center mx-auto mb-2">
+                <Banknote className="h-5 w-5 text-[var(--color-brand-accent-500)]" />
+              </div>
+              <div className="text-xl font-bold text-[rgb(var(--color-text))]">
+                {expenses?.length || 0}
+              </div>
+              <div className="text-xs text-[rgb(var(--color-text-secondary))]">
+                รายจ่าย
+              </div>
+            </div>
+            <div className="flex-shrink-0 w-28 card-mobile p-3 text-center">
+              <div className="h-10 w-10 rounded-xl bg-[var(--color-brand-secondary-500)]/10 flex items-center justify-center mx-auto mb-2">
+                <QrCode className="h-5 w-5 text-[var(--color-brand-secondary-500)]" />
+              </div>
+              <div className="text-lg font-bold text-[rgb(var(--color-text))] font-mono">
+                {event.share_code}
+              </div>
+              <div className="text-xs text-[rgb(var(--color-text-secondary))]">
+                รหัสแชร์
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <Tabs defaultValue="expenses" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-3 bg-[rgb(var(--color-bg-alt))] p-1 rounded-xl">
+              <TabsTrigger
+                value="expenses"
+                className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+              >
+                รายจ่าย
+              </TabsTrigger>
+              <TabsTrigger
+                value="members"
+                className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+              >
+                สมาชิก
+              </TabsTrigger>
+              <TabsTrigger
+                value="balances"
+                className="rounded-lg data-[state=active]:bg-[rgb(var(--color-bg))] data-[state=active]:text-[rgb(var(--color-primary))] data-[state=active]:shadow-sm"
+              >
+                ยอดคงเหลือ
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Expenses Tab */}
+            <TabsContent value="expenses" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+                  รายจ่าย ({expenses?.length || 0})
+                </h2>
+                <Button size="sm" onClick={() => setShowAddExpense(true)}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  เพิ่ม
+                </Button>
+              </div>
+
+              {expensesLoading ? (
+                <SkeletonExpenseList count={3} />
+              ) : !expenses || expenses.length === 0 ? (
+                <div className="card-mobile p-8 text-center">
+                  <div className="h-16 w-16 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center mx-auto mb-4">
+                    <Banknote className="h-7 w-7 text-[rgb(var(--color-text-tertiary))]" />
+                  </div>
+                  <h3 className="font-semibold text-[rgb(var(--color-text))] mb-2">
+                    ยังไม่มีรายจ่าย
+                  </h3>
+                  <p className="text-sm text-[rgb(var(--color-text-secondary))] mb-4">
+                    เพิ่มรายจ่ายแรกเพื่อเริ่มต้น
+                  </p>
+                  <Button onClick={() => setShowAddExpense(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    เพิ่มรายจ่าย
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {expenses.map((expense, index) => (
+                    <div
+                      key={expense.id}
+                      className="card-interactive p-4 touch-feedback animate-fade-in-up"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-11 w-11 rounded-xl bg-[var(--color-brand-accent-500)]/10 flex items-center justify-center">
+                            <Banknote className="h-5 w-5 text-[var(--color-brand-accent-500)]" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-[rgb(var(--color-text))]">
+                              {expense.title}
+                            </div>
+                            <div className="text-sm text-[rgb(var(--color-text-secondary))]">
+                              {expense.payer?.nickname || 'ไม่ทราบ'} จ่าย
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-xs text-[rgb(var(--color-text-secondary))]">
-                          Owed: {formatThaiCurrency(member.totalOwed)}
+                        <div className="text-right">
+                          <Amount value={expense.amount} size="lg" />
+                          <div className="text-xs text-[rgb(var(--color-text-tertiary))]">
+                            {formatRelativeTime(expense.expense_date)}
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      {isPaid ? (
-                        <div className="flex items-center gap-1 text-[rgb(var(--color-success))] font-semibold">
-                          <Check className="h-4 w-4" />
-                          <span className="text-sm">Paid</span>
-                        </div>
-                      ) : (
-                        <>
-                          <div
-                            className={`font-bold ${
-                              isPartial
-                                ? 'text-[rgb(var(--color-warning))]'
-                                : 'text-[rgb(var(--color-error))]'
-                            }`}
-                          >
-                            {formatThaiCurrency(member.balance)}
-                          </div>
-                          {isPartial && (
-                            <div className="text-xs text-[rgb(var(--color-text-secondary))]">
-                              {formatThaiCurrency(member.totalPaid)} paid
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </TabsContent>
-        </Tabs>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
 
-        {/* Quick Actions Bottom Sheet */}
-        <div className="flex items-center gap-3 pb-safe">
-          <button
-            onClick={copyShareLink}
-            className="flex-1 h-12 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text))] font-medium flex items-center justify-center gap-2 touch-feedback active:scale-[0.98] transition-all border border-[rgb(var(--color-border-light))]"
-          >
-            <Copy className="h-5 w-5" />
-            <span>Share Link</span>
-          </button>
-          <Link
-            href={`/events/${event.id}/pay`}
-            className="flex-1 btn-primary h-12 flex items-center justify-center gap-2"
-          >
-            <span>Pay Share</span>
-            <ChevronRight className="h-5 w-5" />
-          </Link>
+            {/* Members Tab */}
+            <TabsContent value="members" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+                  สมาชิก ({event.members.length})
+                </h2>
+                <Sheet open={showAddMember} onOpenChange={setShowAddMember}>
+                  <SheetTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
+                      เพิ่ม
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="bottom" className="rounded-t-2xl">
+                    <SheetHeader className="flex flex-row items-center justify-between">
+                      <SheetTitle>เพิ่มสมาชิก</SheetTitle>
+                      <SheetClose asChild>
+                        <button className="h-8 w-8 rounded-full bg-[rgb(var(--color-bg-alt))] flex items-center justify-center">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </SheetClose>
+                    </SheetHeader>
+                    <div className="space-y-4 mt-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="member-name">ชื่อ</Label>
+                        <Input
+                          id="member-name"
+                          placeholder="กรอกชื่อ"
+                          value={newMemberName}
+                          onChange={(e) => setNewMemberName(e.target.value)}
+                          autoFocus
+                          className="h-12"
+                        />
+                      </div>
+                      <Button
+                        className="w-full"
+                        onClick={handleAddMember}
+                        disabled={!newMemberName.trim() || addMember.isPending}
+                      >
+                        {addMember.isPending ? 'กำลังเพิ่ม...' : 'เพิ่มสมาชิก'}
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+
+              <MemberList members={event.members} />
+            </TabsContent>
+
+            {/* Balances Tab */}
+            <TabsContent value="balances" className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-[rgb(var(--color-text))]">
+                  ใครค้างเท่าไหร่
+                </h2>
+              </div>
+
+              <MemberList members={memberBalances} showBalances />
+            </TabsContent>
+          </Tabs>
+
+          {/* Quick Actions Bottom */}
+          <div className="flex items-center gap-3 pb-safe">
+            <button
+              onClick={copyShareLink}
+              className="flex-1 h-12 rounded-xl bg-[rgb(var(--color-bg-alt))] text-[rgb(var(--color-text))] font-medium flex items-center justify-center gap-2 touch-feedback active:scale-[0.98] transition-all border border-[rgb(var(--color-border-light))]"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-5 w-5 text-[var(--color-semantic-success-500)]" />
+                  <span className="text-[var(--color-semantic-success-500)]">คัดลอกแล้ว</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-5 w-5" />
+                  <span>แชร์ลิงก์</span>
+                </>
+              )}
+            </button>
+            <Button
+              className="flex-1 h-12"
+              onClick={() => setShowAddExpense(true)}
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              เพิ่มรายจ่าย
+            </Button>
+          </div>
         </div>
-      </div>
-    </Container>
+      </Container>
+
+      {/* Expense Form Sheet */}
+      <ExpenseForm
+        open={showAddExpense}
+        onOpenChange={setShowAddExpense}
+        eventId={eventId}
+        members={event.members}
+        onSubmit={handleCreateExpense}
+      />
+    </>
   )
 }

@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Bell, Settings, X, Search } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Bell, Search } from 'lucide-react'
+import { ThemeToggleButton } from '@/components/layout/ThemeToggle'
 
 interface HeaderProps {
   user?: {
@@ -31,16 +31,12 @@ export function Header({ user }: HeaderProps) {
               <span className="text-lg font-bold text-[rgb(var(--color-text))]">YakSplit</span>
             </Link>
 
-            {/* Auth buttons */}
+            {/* Quick action */}
             <div className="flex items-center gap-2">
-              <Link href="/login">
-                <button className="btn-secondary text-sm px-4 py-2">
-                  Log in
-                </button>
-              </Link>
-              <Link href="/login">
+              <ThemeToggleButton />
+              <Link href="/events/new">
                 <button className="btn-primary text-sm px-4 py-2">
-                  Get Started
+                  สร้างกิจกรรม
                 </button>
               </Link>
             </div>
@@ -67,6 +63,9 @@ export function Header({ user }: HeaderProps) {
 
           {/* Right actions */}
           <div className="flex items-center gap-1">
+            {/* Theme toggle */}
+            <ThemeToggleButton />
+
             {/* Search button */}
             <button className="btn-icon btn-icon-ghost">
               <Search className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
@@ -77,13 +76,6 @@ export function Header({ user }: HeaderProps) {
               <Bell className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[rgb(var(--color-accent))]"></span>
             </button>
-
-            {/* Settings */}
-            <Link href="/profile">
-              <button className="btn-icon btn-icon-ghost hidden sm:block">
-                <Settings className="h-5 w-5 text-[rgb(var(--color-text-secondary))]" />
-              </button>
-            </Link>
 
             {/* Avatar - links to profile */}
             <Link href="/profile" className="touch-feedback">
